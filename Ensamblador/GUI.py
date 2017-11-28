@@ -1,82 +1,94 @@
 # -*- coding: utf-8 -*-
-from tkinter import *
+import tkinter as tk
+import os, errno
 from tkinter import filedialog
 
 from macros import Macros
-
-master = Tk()
 
 def macroEnsamblar():
 	
 	filename = filedialog.askopenfilename() #Agregar excepcion
 	vuelta = 0
-	
+
+	directory = filename[:filename.rfind("/")] + "/outMacro/"
+
+	try:
+		os.makedirs(directory)
+	except OSError as e:
+		if e.errno != errno.EEXIST:
+			raise
+
 	mac = Macros(filename)
 	mac.leerArchivo()
 	mac.addMacros()
-	mac.generarArchivo("out"+ str(vuelta) +".txt")
-	imprimirMDT(mac, filename)
-	imprimirMNT(mac, filename)
-	imprimirALA(mac, filename)
-	filename = "out"+ str(vuelta) +".txt"
+	mac.generarArchivo(directory + "out"+ str(vuelta) +".txt")
+	writeTablesText(mac, directory+str(vuelta))
+	filename = directory + "out"+ str(vuelta) +".txt"
 	vuelta += 1
 
 	while(mac.existsNestedMacro):
 		mac = Macros(filename)
 		mac.leerArchivo()
 		mac.addMacros()
-		mac.generarArchivo("out"+ str(vuelta) +".txt")
-		imprimirMDT(mac, filename)
-		imprimirMNT(mac, filename)
-		imprimirALA(mac, filename)
-		filename = "out"+ str(vuelta) +".txt"
+		mac.generarArchivo(directory + "out"+ str(vuelta) +".txt")
+		writeTablesText(mac, directory+str(vuelta))
+		filename = directory + "out"+ str(vuelta) +".txt"
 		vuelta += 1
 
 def ensamblar():
 	pass
 
-def imprimirMDT(mac, filename):
-	tablaMDT = open(filename + "MDT", "w+")
-	contador = 1
+def writeTablesText(mac, filename):
+	tableText = open(filename + "Tables.txt", "w+")
+	count = 1
 
-	tablaMDT.write("CMDT\tCUERPO\n")
+	tableText.write("CMNT\tNOMBRE\tAMDT\tAALA\n")
+	for name in mac.MDTList:
+		tableText.write(str(count) + "\t" + name + "\t" +str(mac.MNT[name][0]) + "\t" + str(mac.MNT[name][1]) + "\n")
+		count += 1
+
+
+	count = 1
+	tableText.write("CMDT\tCUERPO\n")
 	for name in mac.MDTList:
 		for line in mac.MDT[name]:
-			tablaMDT.write(str(contador) + "\t" + line + "\n")
-			contador += 1
-	tablaMDT.close()
+			tableText.write(str(count) + "\t" + line + "\n")
+			count += 1
 
-def imprimirMNT(mac, filename):
-	tablaMNT = open(filename + "MNT", "w+")
-	contador = 1
-
-	tablaMNT.write("CMNT\tNOMBRE\tAMDT\tAALA\n")
-	for name in mac.MDTList:
-		tablaMNT.write(str(contador) + "\t" + name + "\t" +str(mac.MNT[name][0]) + "\t" + str(mac.MNT[name][1]) + "\n")
-		contador += 1
-	tablaMNT.close()
-
-def imprimirALA(mac, filename):
-	tablaALA = open(filename + "ALA", "w+")
-	contador = 1
-	tablaALA.write("CALA\tARG FORMAL\tARG ACTUAL\n")
-
+	count = 1
+	tableText.write("CALA\tARG FORMAL\tARG ACTUAL\n")
 	for name in mac.MDTList:
 		for arg in mac.ALA[name]:
-			tablaALA.write(str(contador) + "\t" + arg + "\t" + mac.ALA[name][arg] + "\n")
-			contador += 1
-	tablaALA.close()
+			tableText.write(str(count) + "\t" + arg + "\t" + mac.ALA[name][arg] + "\n")
+			count += 1
 
-#Botones
-meButton = Button(master, text="Macroensamblar", command = macroEnsamblar)
-meButton.config(height = 5, width = 20)
-meButton.grid(row = 1, column = 0, padx = 5, pady = 5)
+	tableText.close()
 
+class MainApplication:
+	def __init__(self, master):
+		self.master = master
+		self.frame = tk.Frame(self.master)
 
-enButton = Button(master, text="Ensamblar", command = ensamblar)
-enButton.config(height = 5, width = 20)
-enButton.grid(row = 1, column = 1, padx = 5, pady = 5)
+		self.meButton = tk.Button(master, text="Macroensamblar", command = macroEnsamblar)
 
-#imprimirMDT()
-mainloop()
+		self.enButton = tk.Button(master, text="Ensamblar", command = ensamblar)
+
+		self.meButton.config(height = 5, width = 20)
+		self.meButton.grid(row = 0, column = 0, padx = 5, pady = 5)
+		self.enButton.config(height = 5, width = 20)
+		self.enButton.grid(row = 0, column = 1, padx = 5, pady = 5)
+
+		self.meButton.pack()
+		self.enButton.pack()
+		self.frame.pack()
+
+	def close_windows(self):
+		self.master.destroy()
+
+if __name__ == "__main__":
+	root = tk.Tk()
+	root.title("Macro-Ensamblador")
+	app = MainApplication(root)
+	root.mainloop()
+
 
