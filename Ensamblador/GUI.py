@@ -78,10 +78,6 @@ class MainApplication:
 		self.enButton.config(height = 5, width = 20)
 		self.enButton.grid(row = 0, column = 1, padx = 5, pady = 5)
 
-		self.meButton.pack()
-		self.enButton.pack()
-		self.frame.pack()
-
 	def close_windows(self):
 		self.master.destroy()
 
