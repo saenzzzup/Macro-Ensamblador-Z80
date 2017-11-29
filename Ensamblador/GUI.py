@@ -41,8 +41,6 @@ class MainApplication:
 		self.enButton.config(height = 10, width = 20)
 		self.infoButton.config(height = 1, width = 1)
 
-<<<<<<< HEAD
-=======
 		self.checkTables = tk.Checkbutton(self.leftFrame, text="Crear Tablas", variable = self.check, onvalue=1, offvalue=0)
 
 		
@@ -55,7 +53,6 @@ class MainApplication:
 		self.bottomFrame.pack(side = tk.BOTTOM)
 		self.frame.pack()
 
->>>>>>> -New GUI
 	def close_windows(self):
 		self.master.destroy()
 
