@@ -25,9 +25,11 @@ class Ensambler(object):
 		#Operandos
 		self.operands = []
 		# Tabla de simbolos
-		self.TS = []
+		self.TS = {}
 		# Codigo Objeto
-		self.LST = []
+		self.CO = []
+		#Aux
+		self.x = 0
 
 		#self.window = Tk()
 		#self.window.geometry('400x50')
@@ -46,14 +48,69 @@ class Ensambler(object):
 			self.clean_line(line)
 			self.get_label()
 			self.get_operands()
-			#Aqui lo que hare en ves de la cadena Error hara que se llame una funcion que regre None en caso de que 
-			# no exista el opcode y envie un mensaje en pantalla
-			self.code, self.size = mne.map_mnem.get(self.instruction,"Error")(self.operands,self.num_ope,True)
-			print(self.size)
-			self.cl += self.size 
-			lst = {"CL": self.cl, "Code": self.code}
-			self.LST.append(lst)
-		print(self.LST)
+			if self.num_ope == 1:
+				if self.instruction in mne.v_jump:
+					if self.instruction == "JP":
+						self.x = self.TS[operands[0]]
+						print("l")
+						print(self.x)
+
+
+				if self.operands[0] in mne.v_jump:
+					self.instruction = self.instruction + " " + self.operands[0]+","+self.operands[1]
+
+				if self.operands[0][1:-1].isnumeric():
+					self.instruction = self.instruction + " " + self.operands[0]+","+self.operands[1]
+
+
+				if self.num_ope == 1:
+					if self.instruction in mne.v_jump:
+						self.operands[0] = "nn"
+						self.instruction = self.instruction + " " + self.operands[0]
+						code, size = mne.map_mnem.get(self.instruction,"Error")("0000")
+						self.cl += size 
+			else:
+				
+			#Valida si no es opcode valido
+				print(self.instruction)
+			#code, size = mne.map_mnem.get(self.instruction,"Error")()
+			
+			#lst = "CL: " + str(self.cl) + " Code: " + code
+			#self.CO.append(code)
+		print(self.CO)
+		print(self.cl)
+		print(self.TS)
+
+
+	def Second_pass(self):
+		for line in self.fileLines:
+			self.clean_line(line)
+			self.get_label()
+			self.get_operands()
+			
+			if self.instruction in mne.v_jump:
+
+				if len(self.operands) == 2:
+					aux = self.operands[1]
+				else:
+					aux = self.operands[0]
+
+				if aux in self.TS.keys():
+					self.x = self.TS[aux]
+					self.instruction = self.instruction + " " + "nn"
+					code, size = mne.map_mnem.get(self.instruction,"Error")(str(self.x))
+					self.CO.append(code)
+
+				else:
+					print("Error")
+			else:
+				if self.num_ope == 2:
+					self.instruction = self.instruction + " " + self.operands[0]+","+self.operands[1]
+				if self.num_ope == 1:
+					self.instruction = self.instruction + " " + self.operands[0]
+				code, size = mne.map_mnem.get(self.instruction,"Error")()
+				self.CO.append(code)
+		print(self.CO)
 
 
 	#Quitar Comentarios
@@ -70,12 +127,11 @@ class Ensambler(object):
 
 			if label[0] in mne.v_ops or label[0] in mne.map_mnem:
 				print("Error etiqueta invalida")
-
-			element_TS = { "Nombre": label[0], "Valor": str(hex(self.cl)), "Def": "Si"}
-
-			self.TS.append(element_TS)
+			#Quitar espacio al inicio
+			self.TS[label[0].strip()] = self.cl
 
 			del label[0]
+
 
 		self.instruction = label[0]
 
@@ -88,11 +144,9 @@ class Ensambler(object):
 		self.num_ope = len(self.operands)
 
 		
-		
-
-
-
-
+	
 aux = Ensambler("1.txt")
 aux.leerArchivo()
 aux.first_pass()
+aux.Second_pass()
+

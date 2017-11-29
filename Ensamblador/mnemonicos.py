@@ -1,350 +1,497 @@
-
-
-#Register 8 bits
-r = {
-	"B": "000",
-	"C": "001",
-	"D": "010",
-	"E": "011",
-	"H": "100",
-	"L": "101",
-	"A": "111",
-}
-#Register 16 bits
-dd ={
-	"BC": "00",
-	"DE": "01",
-	"HL": "10",
-	"AF": "11",
-}
-#Register 16 bits
-ss ={
-"BC": "00",
-"DE": "01",
-"HL": "10",
-"SP": "11",
-}
-#Register 16 bits
-pp ={
-"BC": "00",
-"DE": "01",
-"IX": "10",
-"AF": "11",
-}
-#Register 16 bits
-rr ={
-"BC": "00",
-"DE": "01",
-"IY": "10",
-"AF": "11",
-}
-#Flag Register
-cc ={
-"NZ": "000",
- "Z":  "001",
-"NC": "010",
-"C":  "011",
-"PO": "100",
-"PE": "101",
-"P":  "110",
-"M":  "111",
-}
-#Valid Operands
-v_ops =[
+#ValidOperands
+v_ops=[
 "A","B","C","D","E","H","L","R","I","BC","DE","HL","AF","AF'","SP","IX","IY",
 "NZ","Z","NC","C","PQ","PE","P","M","(HL)","(IX)","(IY)","(BC)","(DE)","(IY+",
 "(IX+","(SP)","(C)"
 ]
 
-#Opcodes Load
-def LD(operand,op_count,first_pass):
-	opcode = ""
-	size = 0
+v_jump = ["JP","JR","CALL","DJNZ"]
 
-	lds = { ""}
-	if op_count < 2:
-		print("error")
 
-	elif op_count > 2:
-		print("error")
+TS = {}
 
-	else:
-		op1 = operand[0]
-		op2 = operand[1]
-		#Aqui son todos los casos que tiene LD 
-		if op1 == "A":
+#LD A,r
+def LDAA():
+	return "7F",1
 
-			if op2 == "B":
-				opcode = "78"
-				size = 1
-			elif op2 == "(BC)":
-				opcode = "0A"
-				size = 1
-			elif op2 == "(HL)":
-				opcode = "7E"
-				size = 1
+def LDAB():
+	return "78",1
 
+def LDAC():
+	return "79",1
 
+def LDAD():
+	return "7A",1
 
+def LDAE():
+	return "7B",1
 
-	return opcode,size
+def LDAH():
+	return "7C",1
 
-def PUSH(self,operand,op_count, first_pass):
-	pass
+def LDAL():
+	return "7D",1
 
-def POP(self,operand,op_count, first_pass):
-	pass
+def LDAHL():
+	return "7E",1
 
-#Opcodes Exchange, Block Transfer & Block Search
-def EX(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDAIX(dire):
+	return "DD7E"+dire,3
 
-def EXX(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDAIY(dire):
+	return "FD7E"+dire,3
+ 
+ ##AgregarDireccion
+def LDAnn(dire):
+	return "3E"+dire,2
 
-def LDI(self,operand,op_count, first_pass):
-	pass
+def LDABC():
+	return "0A",1
 
-def LDIR(self,operand,op_count, first_pass):
-	pass
+def LDADE():
+	return "1A",1
 
-def LDD(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDANN(dire):
+	return "3A"+dire,3
 
-def LDDR(self,operand,op_count, first_pass):
-	pass
+def LDAI():
+	return "ED57",2
 
-def CPI(self,operand,op_count, first_pass):
-	pass
+def LDAR():
+	return "ED5F",2
 
-def CPIR(self,operand,op_count, first_pass):
-	pass
+#LD B,r
+def LDBA():
+	return "47",1
 
-def CPD(self,operand,op_count, first_pass):
-	pass
+def LDBB():
+	return "40",1
 
-def CPDR(self,operand,op_count, first_pass):
-	pass
+def LDBC():
+	return "41",1
 
-#Opcodes Logic & Arithmetic Group
+def LDBD():
+	return "42",1
 
-def ADD(self,operand,op_count, first_pass):
-	pass
+def LDBE():
+	return "43",1
 
-def ADC(self,operand,op_count, first_pass):
-	pass
+def LDBH():
+	return "44",1
 
-def SUB(self,operand,op_count, first_pass):
-	pass
+def LDBL():
+	return "45",1
 
-def SBC(self,operand,op_count, first_pass):
-	pass
+def LDBHL():
+	return "46",1
 
-def AND(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDBIX(dire):
+	return "DD46"+dire,3
 
-def OR(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDBIY(dire):
+	return "FD46"+dire,3
 
-def XOR(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDBnn(dire):
+	return "06"+dire,2
 
-def CP(self,operand,op_count, first_pass):
-	pass
+#LD C,r
+def LDCA():
+	return "4F",1
 
-def INC(self,operand,op_count, first_pass):
-	pass
+def LDCB():
+	return "48",1
 
-def DEC(self,operand,op_count, first_pass):
-	pass
+def LDCC():
+	return "49",1
 
-#Opcodes Arithmetic & Control CPU Group
+def LDCD():
+	return "4A",1
 
-def DAA(self,operand,op_count, first_pass):
-	pass
+def LDCE():
+	return "4B",1
 
-def CPL(self,operand,op_count, first_pass):
-	pass
+def LDCH():
+	return "4C",1
 
-def NEG(self,operand,op_count, first_pass):
-	pass
+def LDCL():
+	return "4D",1
 
-def CCF(self,operand,op_count, first_pass):
-	pass
+def LDCHL():
+	return "4E",1
 
-def SCF(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDCIX(dire):
+	return "DD4E"+dire,3
 
-def NOP(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDCIY(dire):
+	return "FD4E"+dire,3
 
-def HALT(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDCnn(dire):
+	return "0E"+dire,2
 
-def DI(self,operand,op_count, first_pass):
-	pass
+#LD D,r
+def LDDA():
+	return "57",1
 
-def EI(self,operand,op_count, first_pass):
-	pass
+def LDDB():
+	return "50",1
 
-def IM(self,operand,op_count, first_pass):
-	pass
+def LDDC():
+	return "51",1
 
-#Opcodes Rotate & Shift Group
+def LDDD():
+	return "52",1
 
-def RLCA(self,operand,op_count, first_pass):
-	pass
+def LDDE():
+	return "53",1
 
-def RLA(self,operand,op_count, first_pass):
-	pass
+def LDDH():
+	return "54",1
 
-def RRCA(self,operand,op_count, first_pass):
-	pass
+def LDDL():
+	return "55",1
 
-def RRA(self,operand,op_count, first_pass):
-	pass
+def LDDHL():
+	return "56",1
 
-def RLC(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDDIX(dire):
+	return "DD56"+dire,3
 
-def RL(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDDIY(dire):
+	return "FD56"+dire,3
 
-def RRC(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDDnn(dire):
+	return "16"+dire,2
 
-def RR(self,operand,op_count, first_pass):
-	pass
+#LD E,r
+def LDEA():
+	return "5F",1
 
-def SLA(self,operand,op_count, first_pass):
-	pass
+def LDEB():
+	return "58",1
 
-def SRA(self,operand,op_count, first_pass):
-	pass
+def LDEC():
+	return "59",1
 
-def SRL(self,operand,op_count, first_pass):
-	pass
+def LDED():
+	return "5A",1
 
-def RLD(self,operand,op_count, first_pass):
-	pass
+def LDEE():
+	return "5B",1
 
-def RRD(self,operand,op_count, first_pass):
-	pass
+def LDEH():
+	return "5C",1
 
-#Opcodes Bit SET,RESET & TEST Group
+def LDEL():
+	return "5D",1
 
-def BIT(self,operand,op_count, first_pass):
-	pass
+def LDEHL():
+	return "5E",1
 
-def SET(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDEIX(dire):
+	return "DD5E"+dire,3
 
-def RES(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDEIY(dire):
+	return "FD5E"+dire,3
 
-#Opcodes Jump Group
+ ##AgregarDireccion
+def LDEnn(dire):
+	return "1E"+dire,2
 
-def JP(self,operand,op_count, first_pass):
-	pass
+#LD H,r
+def LDHA():
+	return "67",1
 
-def JR(self,operand,op_count, first_pass):
-	pass
+def LDHB():
+	return "60",1
 
-def DJNZ(self,operand,op_count, first_pass):
-	pass
+def LDHC():
+	return "61",1
 
-#Opcodes Call & Return Group
+def LDHD():
+	return "62",1
 
-def CALL(self,operand,op_count, first_pass):
-	pass
+def LDHE():
+	return "63",1
 
-def RET(self,operand,op_count, first_pass):
-	pass
+def LDHH():
+	return "64",1
 
-def RETI(self,operand,op_count, first_pass):
-	pass
+def LDHL():
+	return "65",1
 
-def RETN(self,operand,op_count, first_pass):
-	pass
+def LDHHL():
+	return "66",1
 
-def RST(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDHIX(dire):
+	return "DD66"+dire,3
 
-#Opcodes Input & Output Group
+ ##AgregarDireccion
+def LDHIY(dire):
+	return "FD66"+dire,3
 
-def IN(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDHnn(dire):
+	return "26"+dire,2
 
-def INI(self,operand,op_count, first_pass):
-	pass
+#LD L,r
+def LDLA():
+	return "6F",1
 
-def INIR(self,operand,op_count, first_pass):
-	pass
+def LDLB():
+	return "68",1
 
-def IND(self,operand,op_count, first_pass):
-	pass
+def LDLC():
+	return "69",1
 
-def INDR(self,operand,op_count, first_pass):
-	pass
+def LDLD():
+	return "6A",1
 
-def OUT(self,operand,op_count, first_pass):
-	pass
+def LDLE():
+	return "6B",1
 
-def OUTI(self,operand,op_count, first_pass):
-	pass
+def LDLH():
+	return "6C",1
 
-def OTIR(self,operand,op_count, first_pass):
-	pass
+def LDLL():
+	return "6D",1
 
-def OUTD(self,operand,op_count, first_pass):
-	pass
+def LDLHL():
+	return "6E",1
 
-def OTDR(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDLIX(dire):
+	return "DD6E"+dire,3
 
-#Opcodes Directives
+ ##AgregarDireccion
+def LDLIY(dire):
+	return "FD6E"+dire,3
 
-def ORG(self,operand,op_count, first_pass):
-	pass
+ ##AgregarDireccion
+def LDLnn(dire):
+	return "2E"+dire,2
 
-def END(self,operand,op_count, first_pass):
-	pass
+#LD HL,r
+def LDHLA():
+	return "77",1
 
-def DB(self,operand,op_count, first_pass):
-	pass
+def LDHLB():
+	return "70",1
 
-def DW(self,operand,op_count, first_pass):
-	pass
+def LDHLC():
+	return "71",1
 
-def DL(self,operand,op_count, first_pass):
-	pass
+def LDHLD():
+	return "72",1
 
-#Mapping Opcodes
-map_mnem = {
-	#Load Group
-	"LD": LD, "PUSH": PUSH, "POP":POP,
-	#Exchange, Block Transfer & Block Search Group
-	"EX": EX, "EXX": EXX, "LDI": LDI, "LDIR": LDIR, "LDD": LDD, "LDDR": LDDR, "CPI": CPI,
-	"CPIR": CPIR, "CPD": CPD, "CPDR": CPDR,
-	#Logic & Arithmetic Group
-	"ADD": ADD, "ADC": ADC, "SUB":SUB, "SBC": SBC, "AND": AND, "OR": OR, "XOR": XOR, "CP": CP,
-	"INC": INC, "DEC": DEC,
-	#Arithmetic & Control CPU Group
-	"DAA": DAA, "CPL": CPL, "NEG": NEG, "CCF": CCF, "SCF": SCF, "NOP": NOP, "HALT": HALT, "DI": DI,
-	"EI": EI, "IM": IM,
-	#Rotate & Shift Group
-	"RLCA": RLCA, "RLA": RLA, "RRCA": RRCA, "RRA": RRA, "RLC": RLC, "RL": RL, "RRC": RRC, "RR": RR,
-	"SLA": SLA, "SRA": SRA, "SRL": SRL, "RLD": RLD, "RRD": RRD,
-	#Bit SET,RESET & TEST Group
-	"BIT": BIT, "SET": SET, "RES": RES,
-	#Jump Group
-	"JP": JP, "JR": JR, "DJNZ": DJNZ,
-	#Call & Return Group
-	"CALL": CALL, "RET": RET, "RETI": RETI, "RETN": RETN, "RST": RST,
-	#Input & Output Group
-	"IN": IN, "INI": INI, "INIR": INIR, "IND": IND, "INDR": INDR, "OUT": OUT, "OUTI": OUTI, "OTIR": OTIR,
-	"OUTD": OUTD, "OTDR": OTDR,
-	#Directives Group
-	"ORG": ORG, "END": END, "DB": DB, "DW": DW, "DL": DL
+def LDHLE():
+	return "73",1
+
+def LDHLH():
+	return "74",1
+
+def LDHLL():
+	return "75",1
+
+ ##AgregarDireccion
+def LDHLnn(dire):
+	return "36"+dire,2
+
+#LD (BC),A
+def LDBCA():
+	return "02",1
+
+#LD (DE),A
+def LDDEA():
+	return "12",1
+
+#LD (NN),A
+ ##AgregarDireccion
+def LDNNA(dire):
+	return "32"+dire,1
+
+#LD (IX+d),r
+def LDIXdA(dire):
+	return "DD77"+dire,3
+
+def LDIXdB(dire):
+	return "DD70"+dire,3
+
+def LDIXdC(dire):
+	return "DD71"+dire,3
+
+def LDIXdD(dire):
+	return "DD72"+dire,3
+
+def LDIXdE(dire):
+	return "DD73"+dire,3
+
+def LDIXdH(dire):
+	return "DD74"+dire,3
+
+def LDIXdL(dire):
+	return "DD75"+dire,3
+
+ ##AgregarDireccion
+def LDIXdnn(dire):
+	return "DD36"+dire,4
+
+#LD (IY+d),r
+def LDIYdA(dire):
+	return "FD77"+dire,1
+
+def LDIYdB(dire):
+	return "FD70"+dire,1
+
+def LDIYdC(dire):
+	return "FD71"+dire,1
+
+def LDIYFD(dire):
+	return "FD72"+dire,1
+
+def LDIYdE(dire):
+	return "FD73"+dire,1
+
+def LDIYdH(dire):
+	return "FD74"+dire,1
+
+def LDIYdL(dire):
+	return "FD75"+dire,1
+
+ ##AgregarDireccion
+def LDHLnn(dire):
+	return "FD36"+dire,3
+
+#LD I,A
+def LDIA():
+	return "ED47",2
+
+#LD R,A
+def LDRA():
+	return "ED4F",2
+
+#LD BC,(nn)
+def LDBCNN(dire):
+	return "ED4B"+dire,4
+
+#LD DE,(nn)
+def LDDENN(dire):
+	return "ED5B"+dire,4
+
+#LD HL,(nn)
+def LDHLNN(dire):
+	return "2A"+dire,4
+
+#LD SP,(nn)
+def LDSPNN(dire):
+	return "ED7B"+dire,4
+
+#LD IX,(nn)
+def LDIXNN(dire):
+	return "DD2A"+dire,4
+
+#LD IY,(nn)
+def LDIYNN(dire):
+	return "FD2A"+dire,4
+
+#LD (nn),BC
+def LDNNBC(dire):
+	return "ED43"+dire,4
+
+#LD (nn),DE
+def LDNNDE(dire):
+	return "ED53"+dire,4
+
+#LD (nn),HL
+def LDNNHL(dire):
+	return "22"+dire,4
+
+#LD (nn),SP
+def LDNNSP(dire):
+	return "ED73"+dire,4
+
+#LD (nn),IX
+def LDNNIX(dire):
+	return "DD22"+dire,4
+
+#LD (nn),IY
+def LDNNIY(dire):
+	return "FD22"+dire,4
+
+#PUSH BC
+def PUSHBC(dire):
+	return "C5"+dire,4
+
+#PUSH DE
+def PUSHDE(dire):
+	return "D5"+dire,4
+
+#PUSH HL
+def PUSHHL(dire):
+	return "E5"+dire,4
+
+#PUSH AF
+def PUSHAF(dire):
+	return "F5"+dire,4
+
+#PUSH IX
+def PUSHIX(dire):
+	return "DDE5"+dire,4
+
+#PUSH IY
+def PUSHIY(dire):
+	return "FDE5"+dire,4
+
+#POP BC
+def PUSHBC(dire):
+	return "C1"+dire,4
+
+#POP DE
+def PUSHDE(dire):
+	return "D1"+dire,4
+
+#POP HL
+def PUSHHL(dire):
+	return "E1"+dire,4
+
+#POP AF
+def PUSHAF(dire):
+	return "F1"+dire,4
+
+#POP IX
+def PUSHIX(dire):
+	return "DDE1"+dire,4
+
+#POP IY
+def PUSHIY(dire):
+	return "FDE1"+dire,4
+
+#JP nn
+def JPnn(dire):
+	return "C3"+dire,3
+
+#JP cc,nn
+def JPCCnn(dire):
+	return "C2"+dire,3
+
+#MappnngOpcodes
+map_mnem={
+ "LD A,A": LDAA, "LD A,B":LDAB, "LD A,C":LDAC, "LD A,NN": LDAnn, "JP nn":JPnn, "JP cc,nn":JPCCnn,
 }
-        
+
+
+
