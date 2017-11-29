@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-from tkinter import Tk, Text, INSERT
 
 class Macros(object):
     
@@ -15,8 +14,6 @@ class Macros(object):
         self.MDTList = []
         self.MNT = {}
         self.ALA = {}
-        self.window = Tk()
-        self.window.geometry('400x50')
     
     def leerArchivo(self):
         file = open(self.fileName, "r")
@@ -38,10 +35,7 @@ class Macros(object):
                 count += 1
 
                 if line.split()[0].replace(":", "") in self.MDT.keys():
-                    messag = "MAS DE UNA DEFINICION REPETIDA: " + line.split()[0].replace(":", "")
-                    text = Text(self.window)
-                    text.insert(INSERT, messag)
-                    text.pack()
+                    messag = "Más de una definición de una Macro con el mismo nombre: " + line.split()[0].replace(":", "")
                     raise Exception(messag)
                  
             if ("MEND" in line):
@@ -58,9 +52,6 @@ class Macros(object):
 
         if count != 0:
             messag = "Faltan Macros por cerrar"
-            text = Text(self.window)
-            text.insert(INSERT, messag)
-            text.pack()
             raise Exception(messag)
 
         self.createMNT()
@@ -130,9 +121,6 @@ class Macros(object):
         if len(instruct) > 1:
             if (len(instruct)-1) != len(self.ALA[macroSearch]):
                 messag = "Faltan argumentos en una macro"
-                text = Text(self.window)
-                text.insert(INSERT, messag)
-                text.pack()
                 raise Exception(messag)
         
         args = self.MDT[macroSearch][0].split()[1:] #DEFINICION: #a1 #a2 #a3 ARGUMENTOS FORMALES
