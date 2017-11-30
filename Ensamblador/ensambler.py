@@ -112,7 +112,7 @@ class Ensambler(object):
 					elif self.terms[1].isalnum():
 						op2 = "nn"
 						band = True
-
+				
 					self.instruction = self.instruction + " " + op1 + "," + op2
 
 				elif num_ter == 1:
@@ -136,21 +136,30 @@ class Ensambler(object):
 					self.instruction = self.instruction + " " + op1
 
 				elif num_ter > 2:
+					##ERROR 
 					print("Error numero de terminas mayor a 2")
 					self.valid = False
 					break
 
-				print(self.instruction)
 				if band:
-					size = mne.map_mnem.get(self.instruction,"Error")(True,"0000")
+					size = mne.map_mnem.get(self.instruction,None)(True,"0000")
 				else:
-					size = mne.map_mnem.get(self.instruction,"Error")(True)
+					size = mne.map_mnem.get(self.instruction,None)(True)
+
+				if size == None:
+					## Puedes decir que instruccion apartir de self.intruccion 
+					##Error intruccion desconocida
+					##Verifique la intruccion o los terminos a operar
+					break
 				
 				aux =  hex(self.cl)[2:].upper()
 				self.list_cl.append("0000"[len(aux):] + aux)
 				self.cl += size
 
 			else:
+				##eRROR
+				# SINTAXIS MAL 
+				# puedes mostrar la instruccion para que se veo mejor cheque el manual
 				self.valid = False
 				break
 
@@ -333,20 +342,31 @@ class Ensambler(object):
 						self.instruction = self.instruction + " "+ aux
 
 						if dire != "":
-							code = mne.map_mnem.get(self.instruction,"Error")(False,dire)
+
+							code = mne.map_mnem.get(self.instruction,None)(False,dire)
 						else:
-							code = mne.map_mnem.get(self.instruction,"Error")(False)
+							code = mne.map_mnem.get(self.instruction,None)(False)
 
 					if num_ter == 0:
-						code = mne.map_mnem.get(self.instruction,"Error")(False)
+						code = mne.map_mnem.get(self.instruction,None)(False)
+
+					if code == None:
+						## Puedes decir que instruccion apartir de "self.intruccion" y la linea con "cont"
+						##Error intruccion desconocida
+						##Verifique la intruccion o los terminos a operar
+						break
 
 					self.CO.append(code)
 					cont += 1
 
 				else:
+					##eRROR
+					# SINTAXIS MAL
+					# puedes mostrar la instruccion para que se veo mejor cheque el manual
 					self.valid = False
 					break
 		else:
+			##eRROR primera pasda incompleta error en sintaxis
 			print("Error en la primera pasada no completada")
 
 		self.CO.append(self.dir_in_e)
@@ -375,6 +395,7 @@ class Ensambler(object):
 		if len(label) > 1:
 
 			if label[0] in mne.v_ops or label[0] in mne.map_mnem:
+				##Error si usa una etiqueta con palabras reservadas
 				print("Error etiqueta invalida")
 
 			if first_pass:
@@ -387,6 +408,7 @@ class Ensambler(object):
 					aux = num[len(aux):]+aux
 
 				if label[0].strip() in self.TS:
+					##Error valor definido en la tabla puedes mostrar cual con label[0]
 					print("Error valor repetido en la tabla")
 					self.valid_sintx = False
 

@@ -100,10 +100,10 @@ def DECC(is_first_pass):
 		return 1
 	return "0D"
 
-def LDCN(is_first_pass):
+def LDCN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
-	return "0E20"
+	return "0E"+dire
 
 def RRCA(is_first_pass):
 	if (is_first_pass):
@@ -140,20 +140,20 @@ def DECD(is_first_pass):
 		return 1
 	return "15"
 
-def LDDN(is_first_pass):
+def LDDN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
-	return "1620"
+	return "16"+dire
 
 def RLA(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "17"
 
-def JRDIS(is_first_pass):
+def JRDIS(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
-	return "182E"
+	return "18"+dire
 
 def ADDHLDE(is_first_pass):
 	if (is_first_pass):
@@ -1325,47 +1325,47 @@ def RLCHL(is_first_pass):
 		return 2
 	return "CB06"
 
-def RLCA(is_first_pass):
+def RLC_A(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB07"
+	return "CB"
 
-def RRCB(is_first_pass):
+def RRC_B(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB08"
 
-def RRCC(is_first_pass):
+def RRC_C(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB09"
 
-def RRCD(is_first_pass):
+def RRC_D(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB0A"
 
-def RRCE(is_first_pass):
+def RRC_E(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB0B"
 
-def RRCH(is_first_pass):
+def RRC_H(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB0C"
 
-def RRCL(is_first_pass):
+def RRC_L(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB0D"
 
-def RRCHL(is_first_pass):
+def RRC_HL(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB0E"
 
-def RRCA(is_first_pass):
+def RRC_A(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "CB0F"
@@ -3471,14 +3471,19 @@ def SET7IYd(is_first_pass):
 	return "FDCB05FE"
 
 
+##Esto hay que llenarlo con todas las funciones de arriba
 #MappnngOpcodes
 map_mnem={
- "NOP": NOP, "LD (BC),A": LDBCA,"INC BC": INCBC, "INC B": INCB, "DEC B": DECB, "LD B,n":LDBN,
- "RLCA": RLCA, "EX AF,AF'": EXAFAF, "ADD HL, BC": ADDHLBC,
-
+ "NOP": NOP, "LD (BC),A": LDBCA,"INC BC": INCBC, "INC B": INCB, "DEC B": DECB, "LD B,n": LDBN,
+ "RLCA": RLCA, "EX AF,AF'": EXAFAF, "ADD HL,BC": ADDHLBC, "LD A,(BC)": LDABC, "DEC BC": DECBC,
+ "INC C":INCC, "DEC C": DECC, "LD C,n":LDCN, "RRCA": RRCA, "DJNZ e": DJNZDIS, "LD DE,nn":LDDENN,
+ "LD (DE),A": LDDEA, "INC DE": INCDE, "INC D": INCD, "DEC D": DECD, "LD D,n":LDDN, "RLA": RLA,
+ "JR e": JRDIS, "ADD HL,DE": ADDHLDE, "LD A,(DE)": LDADE, "DEC DE": DECDE, "INC E": INCE, "DEC E":DECE,
+ "LD E,n": LDEN, "RRA":RRA, "JR nz,e": JRNZDIS, "LD HL,nn": LDHLNN, "LD (nn),HL": LDNNHL,
+ "INC HL": INCHL, "INC H": INCH, "DEC H": DECH,
  "LD A,(nn)": LDANN,
  "LD A,A": LDAA, "LD A,B": LDAB, "LD A,C":LDAC, "JP p,nn":JPPNN ,"JP nn":JPNN,
- "LD A,n": LDAN,"LD D,B": LDDB, "JP p,nn"
+ "LD A,n": LDAN,"LD D,B": LDDB, "JP p,nn":JPPNN,
  "LD (IX+d),n": LDIXdN, "LD (IY+d),n": LDIYdN,
  "DEC B": DECB, "DB n": DB,"EQU n": EQU, "CP n": CPN, "JP z,nn": JPZNN, "LD B,A": LDBA,
  "JR z,e": JRZDIS, "CP B": CPB, "JP P,nn": JPPNN, "LD E,A": LDEA, "LD D,A":LDDA,
