@@ -84,7 +84,7 @@ class MainApplication:
 			self.newWindow = tk.Toplevel(self.master)
 			self.pop = PopUP(self.newWindow)
 			self.pop.addMessage("Archivo", "No se seleccióno un archivo.")
-			return
+			return False
 
 		if os.name == 'nt':
 			self.directory = self.filename[:self.filename.rfind("\\")] + "\\Out\\"
@@ -96,10 +96,11 @@ class MainApplication:
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
+		return True
 
 	def ensamblar(self):
 
-		self.fileOpener()
+		if not self.fileOpener(): return
 
 		ens = Ensambler(self.filename)
 		ens.leerArchivo()
@@ -116,12 +117,18 @@ class MainApplication:
 
 		fileOut = open (self.directory + "out.co", "w+")
 		for line in ens.CO:
-			fileOut.write(line)
+			fileOut.write(line + "\n")
 		fileOut.close()
+
+		self.newWindow = tk.Toplevel(self.master)
+		self.pop = PopUP(self.newWindow)
+		self.pop.addMessage("Información",
+			"Archivo .CO creado en: \n" +
+			self.directory)
 
 	def macroEnsamblar(self):
 	
-		self.fileOpener()
+		if not self.fileOpener(): return
 
 		while(self.macroCicles()):
 			self.filename = self.directory + "out"+ str(self.cicle) +".ASM"

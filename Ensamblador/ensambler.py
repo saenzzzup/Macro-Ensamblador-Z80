@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import io
 import mnemonicos as mne
 
 class Ensambler(object):
@@ -40,13 +42,13 @@ class Ensambler(object):
 
 	"""
 	def leerArchivo(self):
-		file = open(self.fileName, "r")
+		file = io.open(self.fileName, encoding='latin-1')
+
 		for line in file:
 			line = line.replace("\n", "")
 			line = line.replace("\t", "")
 			self.fileLines.append(line)
 		file.close()
-		self.fileLines = filter(lambda a: a != "", self.fileLines)
 
 	""" 
 	Primera pasada del ensamblador.
@@ -55,7 +57,8 @@ class Ensambler(object):
 
 	"""
 	def first_pass(self):
-		for line in self.fileLines:
+		fileLines = filter(lambda a: a != "", self.fileLines)
+		for line in fileLines:
 			self.clean_line(line)
 			self.get_label(True)
 			if self.valid_sintx:
@@ -186,7 +189,6 @@ class Ensambler(object):
 		self.dir_in_c = self.list_cl[0]
 		self.CO.append(self.size)
 		self.CO.append(self.dir_in_c)
-		print(self.TS)
 
 	""" 
 	Segunda pasada del ensamblador.
@@ -197,7 +199,8 @@ class Ensambler(object):
 	def Second_pass(self):
 		num = "00"
 		cont = 0
-		for line in self.fileLines:
+		fileLines = filter(lambda a: a != "", self.fileLines)
+		for line in fileLines:
 			self.clean_line(line)
 			self.get_label(False)
 			if self.valid_sintx:
@@ -389,7 +392,7 @@ class Ensambler(object):
 							raise Exception(messag)
 
 				if num_ter == 0:
-					try
+					try:
 						code = mne.map_mnem.get(self.instruction,None)(False)
 					except Exception as ex:
 						messag = "Error intruccion desconocida: " +line+ "\n Verifique la intruccion o los terminos a operar"
@@ -407,7 +410,6 @@ class Ensambler(object):
 				raise Exception(messag)
 
 		self.CO.append(self.dir_in_e)
-		print(self.CO)
 
 	"""
 	Quitar comentarios de la linea y dejar solo la instrucción
@@ -466,13 +468,4 @@ class Ensambler(object):
 			self.instruction = self.terms[0]
 			del self.terms[0]
 		return len(self.terms)
-
-aux = Ensambler("1.txt")
-aux.leerArchivo()
-aux.first_pass()
-aux.Second_pass()
-fileOut = open ("1.co", "w+")
-for line in aux.CO:
-	fileOut.write(line)
-fileOut.close()
 

@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 #ValidOperands
 v_ops=[
 "A","B","C","D","E","H","L","R","I","BC","DE","HL","AF","AF'","SP","IX","IY",
