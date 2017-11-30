@@ -4,6 +4,7 @@ import os, errno
 from tkinter import filedialog
 
 from macros import Macros
+from ensambler import Ensambler
 
 class PopUP:
 	def __init__(self, master):
@@ -43,11 +44,13 @@ class MainApplication:
 
 		self.checkTables = tk.Checkbutton(self.leftFrame, text="Crear Tablas", variable = self.check, onvalue=1, offvalue=0)
 
-		
+		self.text = tk.Label(self.rightFrame, text= "® FI UNAM")
+	
 		self.meButton.pack()
 		self.enButton.pack()
 		self.infoButton.pack()
 		self.checkTables.pack(side = tk.LEFT)
+		self.text.pack(side = tk.RIGHT)	
 		self.leftFrame.pack(side = tk.LEFT)
 		self.rightFrame.pack(side = tk.RIGHT)
 		self.bottomFrame.pack(side = tk.BOTTOM)
@@ -111,8 +114,8 @@ class MainApplication:
 			self.pop.addMessage("Error", str(ex))
 			return
 
-		fileOut = open ("out.co", "w+")
-		for line in aux.CO:
+		fileOut = open (self.directory + "out.co", "w+")
+		for line in ens.CO:
 			fileOut.write(line)
 		fileOut.close()
 

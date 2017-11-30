@@ -46,6 +46,7 @@ class Ensambler(object):
 			line = line.replace("\t", "")
 			self.fileLines.append(line)
 		file.close()
+		self.fileLines = filter(lambda a: a != "", self.fileLines)
 
 	""" 
 	Primera pasada del ensamblador.
@@ -54,8 +55,7 @@ class Ensambler(object):
 
 	"""
 	def first_pass(self):
-		fileLines = filter(lambda a: a != "", self.fileLines)
-		for line in fileLines:
+		for line in self.fileLines:
 			self.clean_line(line)
 			self.get_label(True)
 			if self.valid_sintx:
@@ -159,10 +159,14 @@ class Ensambler(object):
 					messag = "Error numero de terminas mayor a 2"
 					raise Exception(messag)
 
-				if band:
-					size = mne.map_mnem.get(self.instruction,None)(True,"0000")
-				else:
-					size = mne.map_mnem.get(self.instruction,None)(True)
+				try:
+					if band:
+						size = mne.map_mnem.get(self.instruction,None)(True,"0000")
+					else:
+						size = mne.map_mnem.get(self.instruction,None)(True)
+				except Exception as ex:
+					messag = "Error intruccion desconocida: " +line+ "\n Verifique la intruccion o los terminos a operar"
+					raise Exception(messag)
 
 				if size == None:
 					messag = "Error intruccion desconocida \n Verifique la intruccion o los terminos a operar"
@@ -193,7 +197,6 @@ class Ensambler(object):
 	def Second_pass(self):
 		num = "00"
 		cont = 0
-		fileLines = filter(lambda a: a != "", self.fileLines)
 		for line in self.fileLines:
 			self.clean_line(line)
 			self.get_label(False)
@@ -295,11 +298,15 @@ class Ensambler(object):
 
 						self.instruction = self.instruction + " " + aux + ", " + aux2
 						
-						if dire != "" or dire2 != "":
-							code = mne.map_mnem.get(self.instruction,None)(False,dire+dire2)
+						try:
+							if dire != "" or dire2 != "":
+								code = mne.map_mnem.get(self.instruction,None)(False,dire+dire2)
 
-						else:
-							code = mne.map_mnem.get(self.instruction,None)(False)
+							else:
+								code = mne.map_mnem.get(self.instruction,None)(False)
+						except Exception as ex:
+							messag = "Error intruccion desconocida: " +line+ "\n Verifique la intruccion o los terminos a operar"
+							raise Exception(messag)
 
 				elif num_ter == 1:
 						aux = self.terms[0]
@@ -371,13 +378,22 @@ class Ensambler(object):
 
 						self.instruction = self.instruction + " "+ aux
 
-						if dire != "":
-							code = mne.map_mnem.get(self.instruction,None)(False,dire)
-						else:
-							code = mne.map_mnem.get(self.instruction,None)(False)
+
+						try:
+							if dire != "":
+								code = mne.map_mnem.get(self.instruction,None)(False,dire)
+							else:
+								code = mne.map_mnem.get(self.instruction,None)(False)
+						except Exception as ex:
+							messag = "Error intruccion desconocida: " +line+ "\n Verifique la intruccion o los terminos a operar"
+							raise Exception(messag)
 
 				if num_ter == 0:
+					try
 						code = mne.map_mnem.get(self.instruction,None)(False)
+					except Exception as ex:
+						messag = "Error intruccion desconocida: " +line+ "\n Verifique la intruccion o los terminos a operar"
+						raise Exception(messag)
 
 				if code == None:
 					messag = "Intruccion desconocida: " + self.intruccion + "\nError en la primera pasada no completada"
@@ -451,7 +467,6 @@ class Ensambler(object):
 			del self.terms[0]
 		return len(self.terms)
 
-	
 aux = Ensambler("1.txt")
 aux.leerArchivo()
 aux.first_pass()
@@ -460,3 +475,4 @@ fileOut = open ("1.co", "w+")
 for line in aux.CO:
 	fileOut.write(line)
 fileOut.close()
+
