@@ -1,6 +1,4 @@
-
 import mnemonicos as mne
-
 
 class Ensambler(object):
 
@@ -56,7 +54,8 @@ class Ensambler(object):
 
 	"""
 	def first_pass(self):
-		for line in self.fileLines:
+		fileLines = filter(lambda a: a != "", self.fileLines)
+		for line in fileLines:
 			self.clean_line(line)
 			self.get_label(True)
 			if self.valid_sintx:
@@ -80,39 +79,49 @@ class Ensambler(object):
 						op2 = self.terms[1]
 
 					elif self.terms[0][:4] == "(IX+":
-						op1 = "(IX+d)"
+						op1 = "(IX + d)"
 						band = True
 
 					elif self.terms[0][:4] == "(IY+":
-						op1 = "(IY+d)"
+						op1 = "(IY + d)"
 						band = True
 
 					elif self.terms[0][1:-1].isalnum():
-						op1 = "(nn)"
-						band = True
-
-					elif self.terms[1].isdigit():
-						op2 = "n"
+						op1 = "(NN)"
 						band = True
 
 					elif self.instruction == "JP" or self.instruction == "CALL":
-						op2 = "nn"
+						op2 = "NN"
+						op1 = op1.upper()
 						band = True
 
 					elif self.instruction == "JR":
 						op2 = "e"
+						op1 = op1.upper()
 						band = True
 
-					elif self.terms[1][1:-1].isalnum():
-						op2 = "(nn)"
+					elif self.terms[1][:4] == "(IX+":
+						op2 = "(IX + d)"
+						band = True
+
+					elif self.terms[1][:4] == "(IY+":
+						op2 = "(IY + d)"
+						band = True
+
+					elif self.terms[1][1:-1].isalnum() and self.terms[1][:1] == "(":
+						op2 = "(NN)"
+						band = True
+
+					elif self.terms[1].isalnum() and len(self.terms[0]) == 2:
+						op2 = "NN"
 						band = True
 
 					elif self.terms[1].isalnum():
-						op2 = "nn"
+						op2 = "N"
 						band = True
-				
-					self.instruction = self.instruction + " " + op1 + "," + op2
-
+					
+					self.instruction = self.instruction + " " + op1 + ", " + op2
+					
 				elif num_ter == 1:
 					op1 = self.terms[0]
 
@@ -120,15 +129,28 @@ class Ensambler(object):
 						op1 = self.terms[0]
 
 					elif self.instruction == "JP" or self.instruction == "CALL":
-						op1 = "nn"
+						op1 = "NN"
 						band = True
 						
 					elif self.instruction == "JR" or self.instruction == "DJNZ":
 						op1 = "e"
 						band = True
 
+					elif self.terms[0][:4] == "(IX+":
+						op1 = "(IX + d)"
+						band = True
+
+					elif self.terms[0][:4] == "(IY+":
+						op1 = "(IY + d)"
+						band = True
+
+
+					elif self.terms[0][1:-1].isalnum() and self.terms[0][:1] == "(":
+						op1 = "(NN)"
+						band = True
+
 					elif self.terms[0].isalnum():
-						op1 = "n"
+						op1 = "N"
 						band = True
 
 					self.instruction = self.instruction + " " + op1
@@ -145,7 +167,7 @@ class Ensambler(object):
 				if size == None:
 					messag = "Error intruccion desconocida \n Verifique la intruccion o los terminos a operar"
 					raise Exception(messag)
-				
+			
 				aux =  hex(self.cl)[2:].upper()
 				self.list_cl.append("0000"[len(aux):] + aux)
 				self.cl += size
@@ -155,10 +177,12 @@ class Ensambler(object):
 				raise Exception(messag)
 
 
-		self.size = hex(self.cl-1)[2:]
+		aux = hex(self.cl-1)[2:].upper()
+		self.size = "00"[len(aux):] + aux
 		self.dir_in_c = self.list_cl[0]
 		self.CO.append(self.size)
 		self.CO.append(self.dir_in_c)
+		print(self.TS)
 
 	""" 
 	Segunda pasada del ensamblador.
@@ -168,7 +192,8 @@ class Ensambler(object):
 	"""
 	def Second_pass(self):
 		num = "00"
-		cont = 2
+		cont = 0
+		fileLines = filter(lambda a: a != "", self.fileLines)
 		for line in self.fileLines:
 			self.clean_line(line)
 			self.get_label(False)
@@ -176,165 +201,183 @@ class Ensambler(object):
 				num_ter = self.get_terms()
 
 				if num_ter == 2:
-					aux = self.terms[0]
-					aux2 = self.terms[1]
-					dire = ""
-					dire2 = ""
-
-					if self.terms[0][1:-1] in self.TS.keys():
-						aux = "(nn)"
-						dire = self.TS[self.terms[0][1:-1]]
-						dire = dire[2:]+dire[:-2]
-
-					if self.terms[0] in  mne.v_ops and self.terms[1] in  mne.v_ops:
 						aux = self.terms[0]
 						aux2 = self.terms[1]
+						dire = ""
+						dire2 = ""
 
-					elif self.terms[0][:4] == "(IX+":
-						aux = "(IX+d)"
-						dire = self.terms[0][4:-2]
-						dire = dire[2:]+dire[:-2]
+						if self.terms[0][1:-1] in self.TS.keys():
+							aux = "(NN)"
+							dire = self.TS[self.terms[0][1:-1]]
+							dire = dire[2:]+dire[:-2]
 
-					elif self.terms[0][:4] == "(IY+":
-						aux = "(IY+d)"
-						dire = self.terms[0][4:-2]
-						dire = dire[2:]+dire[:-2]
+						elif self.terms[0] in  mne.v_ops and self.terms[1] in  mne.v_ops:
+							aux = self.terms[0]
+							aux2 = self.terms[1]
 
-					elif self.terms[0][1:-1].isalnum():
-						aux = "(nn)"
-						dire = self.terms[0][1:-2]
-						dire = dire[2:]+dire[:-2]
+						elif self.terms[0][:4] == "(IX+":
+							aux = "(IX + d)"
+							dire = self.terms[0][4:-2]
 
-					elif self.terms[1].isdigit():
-						aux2 = "n"
-						dire2 = self.terms[1]
+						elif self.terms[0][:4] == "(IY+":
+							aux = "(IY + d)"
+							dire = self.terms[0][4:-2]
 
-					elif self.terms[1][1:-1] in self.TS.keys():
-						aux2 = "(nn)"
-						dire2 = self.TS[self.terms[1][1:-1]]
-						dire2 = dire2[2:]+dire2[:-2]
+						elif self.terms[0][1:-1].isalnum():
+							aux = "(NN)"
+							dire = self.terms[0][1:-2]
+							dire = dire[2:]+dire[:-2]
 
-					elif self.terms[1] in self.TS.keys():
-						aux2 = "nn"
-						dire2 = self.TS[self.terms[1]]
+						elif self.instruction == "JP":
+							aux2 = "NN"
+							aux = aux.upper()
+							dire2 = self.TS[self.terms[1]]
+							dire2 = dire2[2:]+dire2[:-2]
 
-					elif self.instruction == "JP":
-						aux2 = "nn"
-						dire2 = self.TS[self.terms[1]]
-						dire2 = dire2[2:]+dire2[:-2]
+						elif self.instruction == "JR":
+							aux2 = "e"
+							aux = aux.upper()
+							dire2 = self.TS[self.terms[1]]
+							direnew = int(dire2,16)
+							direact = int(str(self.list_cl[cont+1]),16)
+							dire2 = direnew-direact
+							if dire2 < 0:
+								dire2 =bin(dire2)[3:]
+								dire2 = "00000000"[len(dire2):] + dire2
+								pos = 0
+								dire1 = ""
+								for char in dire2:
+									if char == '0':
+										dire1 += '1'
+									else:
+										dire1 += dire2[pos:]
+										break
+									pos+=1
 
-					elif self.instruction == "JR":
-						aux2 = "e"
-						dire2 = self.TS[self.terms[1]]
-						direnew = int(dire2,16)
-						direact = int(str(self.list_cl[cont+1]),16)
-						dire2 = direnew-direact
-						if dire2 < 0:
-							dire2 =bin(dire2)[3:]
-							dire2 = "00000000"[len(dire2):] + dire2
-							pos = 0
-							dire1 = ""
-							for char in dire2:
-								if char == '0':
-									dire1 += '1'
-								else:
-									dire1 += dire2[pos:]
-									break
-								pos+=1
+								dire2 = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
+							else:
+								dire2 = hex(dire2)[2:]
 
-							dire2 = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
+						elif self.terms[1][:4] == "(IX+" or self.terms[1][:2] == "IX":
+							aux2 = "(IX + d)"
+							dire2 = self.terms[1][4:-1]
+
+						elif self.terms[1][:4] == "(IY+" or self.terms[1][:2] == "IY":
+							aux2 = "(IY + d)"
+							dire2 = self.terms[1][4:-1]
+
+						elif self.terms[1][1:-1] in self.TS.keys():
+							aux2 = "(NN)"
+							dire2 = self.TS[self.terms[1][1:-1]]
+							dire2 = dire2[2:]+dire2[:-2]
+
+						elif self.terms[1] in self.TS.keys() and self.instruction == "LD":
+							aux2 = "N"
+							dire2 = self.TS[self.terms[1]]
+
+						elif self.terms[1] in self.TS.keys():
+							aux2 = "(NN)"
+							dire2 = self.TS[self.terms[1]]
+
+						elif self.terms[1].isdigit():
+							aux2 = "N"
+							dire2 = self.terms[1]
+
+						elif self.terms[1][1:-1].isalnum() and self.terms[1][:1] == "(":
+							aux2 = "(NN)"
+							dire2 = self.terms[1][1:-2]
+							dire2 = dire2[2:]+dire2[:-2]
+
+						elif self.terms[1].isalnum():
+							aux2 = "NN"
+							dire2 = self.terms[1][:-1]
+							dire2 = dire2[2:]+dire2[:-2]
+
+						self.instruction = self.instruction + " " + aux + ", " + aux2
+						
+						if dire != "" or dire2 != "":
+							code = mne.map_mnem.get(self.instruction,None)(False,dire+dire2)
+
 						else:
-							dire2 = hex(dire2)[2:]
-
-					elif self.terms[1][1:-1].isalnum():
-						aux2 = "(nn)"
-						dire2 = self.terms[0][1:-2]
-						dire2 = dire2[2:]+dire2[:-2]
-
-					self.instruction = self.instruction + " " + aux + "," + aux2
-
-					if dire != "" or dire2 != "":
-						code = mne.map_mnem.get(self.instruction,"Error")(False,dire+dire2)
-
-					else:
-						code = mne.map_mnem.get(self.instruction,"Error")(False)
+							code = mne.map_mnem.get(self.instruction,None)(False)
 
 				elif num_ter == 1:
-					aux = self.terms[0]
-					dire = ""
-
-					if self.terms[0][1:-1] in self.TS.keys():
-						aux = "(nn)"
-						dire = self.TS[self.terms[0][1:-1]]
-						dire = dire[2:]+dire[:-2]
-
-					if self.terms[0] in  mne.v_ops:
 						aux = self.terms[0]
+						dire = ""
 
-					elif self.terms[0][:4] == "(IX+":
-						aux = "(IX+d)"
-						dire = self.terms[0][4:-2]
-						dire = dire[2:]+dire[:-2]
+						if self.terms[0][1:-1] in self.TS.keys():
+							aux = "(NN)"
+							dire = self.TS[self.terms[0][1:-1]]
+							dire = dire[2:]+dire[:-2]
 
-					elif self.terms[0][:4] == "(IY+":
-						aux = "(IY+d)"
-						dire = self.terms[0][4:-2]
-						dire = dire[2:]+dire[:-2]
+						elif self.instruction == "JP":
+							aux = "NN"
+							dire = str(self.TS.get(self.terms[0],None))
+							dire = dire[2:]+dire[:-2]
 
-					elif self.terms[0][1:-1].isalnum():
-						aux = "(nn)"
-						dire = self.terms[0][1:-2]
-						dire = dire[2:]+dire[:-2]
+						elif self.instruction == "JR":
+							aux2 = "e"
+							dire = self.TS[self.terms[0]]
+							direnew = int(dire2,16)
+							direact = int(str(self.list_cl[cont+1]),16)
+							dire = direnew - direact
+							if dire2 < 0:
+								dire2 =bin(dire2)[3:]
+								dire2 = "00000000"[len(dire2):] + dire2
+								pos = 0
+								dire1 = ""
+								for char in dire2:
+									if char == '0':
+										dire1 += '1'
+									else:
+										dire1 += dire2[pos:]
+										break
+									pos+=1
 
-					elif self.instruction == "DL":
-						x = str(self.TS.get(self.terms[0],None))
+								dire = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
+							else:
+								dire = hex(dire2)[2:]
 
-					elif self.instruction == "JP":
-						aux = "nn"
-						dire = str(self.TS.get(self.terms[0],None))
-						dire = dire[2:]+dire[:-2]
 
-					elif self.instruction == "JR":
-						aux2 = "e"
-						dire = self.TS[self.terms[0]]
-						direnew = int(dire2,16)
-						direact = int(str(self.list_cl[cont+1]),16)
-						dire = direnew - direact
-						if dire2 < 0:
-							dire2 =bin(dire2)[3:]
-							dire2 = "00000000"[len(dire2):] + dire2
-							pos = 0
-							dire1 = ""
-							for char in dire2:
-								if char == '0':
-									dire1 += '1'
-								else:
-									dire1 += dire2[pos:]
-									break
-								pos+=1
-							dire = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
-						else:
-							dire = hex(dire2)[2:]
+						elif self.terms[0] in self.TS.keys():
+							aux = "N"
+							dire = self.TS[self.terms[0]]
 
-					elif self.terms[0][1:-1].isalnum():
-						aux = "(nn)"
-						dire = self.terms[0][1:-2]
-						dire = dire[2:]+dire[:-2]
+						elif self.terms[0] in  mne.v_ops:
+							aux = self.terms[0]
+
+						elif self.terms[0][:4] == "(IX+":
+							aux = "(IX + d)"
+							dire = self.terms[0][4:-2]
+
+						elif self.terms[0][:4] == "(IY+":
+							aux = "(IY + d)"
+							dire = self.terms[0][4:-1]
+
+						elif self.instruction == "DL":
+							aux = "NN"
+							dire = self.list_cl[cont]
+							self.TS[self.terms[0].strip()] = dire
+
+
+						elif self.terms[0][1:-1].isalnum():
+							aux = "(NN)"
+							dire = self.terms[0][1:-2]
+							dire = dire[2:]+dire[:-2]
 						
-					elif self.terms[0].isdigit():
-						aux = "n"
-						dire = "00"[len(self.terms[0]):]+self.terms[0]
-	
-					self.instruction = self.instruction + " "+ aux
+						elif self.terms[0].isdigit():
+							aux = "N"
+							dire = "00"[len(self.terms[0]):]+self.terms[0]
 
-					if dire != "":
+						self.instruction = self.instruction + " "+ aux
 
-						code = mne.map_mnem.get(self.instruction,None)(False,dire)
-					else:
-						code = mne.map_mnem.get(self.instruction,None)(False)
+						if dire != "":
+							code = mne.map_mnem.get(self.instruction,None)(False,dire)
+						else:
+							code = mne.map_mnem.get(self.instruction,None)(False)
 
 				if num_ter == 0:
-					code = mne.map_mnem.get(self.instruction,None)(False)
+						code = mne.map_mnem.get(self.instruction,None)(False)
 
 				if code == None:
 					messag = "Intruccion desconocida: " + self.intruccion + "\nError en la primera pasada no completada"
@@ -348,7 +391,7 @@ class Ensambler(object):
 				raise Exception(messag)
 
 		self.CO.append(self.dir_in_e)
-
+		print(self.CO)
 
 	"""
 	Quitar comentarios de la linea y dejar solo la instrucción
@@ -407,3 +450,13 @@ class Ensambler(object):
 			self.instruction = self.terms[0]
 			del self.terms[0]
 		return len(self.terms)
+
+	
+aux = Ensambler("1.txt")
+aux.leerArchivo()
+aux.first_pass()
+aux.Second_pass()
+fileOut = open ("1.co", "w+")
+for line in aux.CO:
+	fileOut.write(line)
+fileOut.close()

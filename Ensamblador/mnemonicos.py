@@ -1,7 +1,8 @@
+
 #ValidOperands
 v_ops=[
 "A","B","C","D","E","H","L","R","I","BC","DE","HL","AF","AF'","SP","IX","IY",
-"nz","z","nc","c","pq","pe","p","m","(HL)","(IX)","(IY)","(BC)","(DE)","(SP)","(C)"
+"NZ","Z","NC","C","PQ","PE","P","M","(HL)","(IX)","(IY)","(BC)","(DE)","(SP)","(C)"
 ]
 v_op = ["LD","PUSH","POP","EX","EXX","LDI","LDIR","LDD","LDDR","CPI","CPIR","CPD",
 "CPDR","ADD","ADC","SUB","SBC","AND","OR","XOR","CP","INC","DEC","DAA","CPL","NEG",
@@ -9,6 +10,26 @@ v_op = ["LD","PUSH","POP","EX","EXX","LDI","LDIR","LDD","LDDR","CPI","CPIR","CPD
 "RR","SLA","SRA","SRL","RLD","RRD","BIT","SET","RES","JP","JR","DJNZ","CALL","RET",
 "RETI","RETN","RST","IN","INI","INIR","IND","INDR","OUT","OUTI","OUTIR","OUTD","OTDR"
 ]
+
+def DB(is_first_pass,value):
+	if (is_first_pass):
+		return 1
+	return value
+
+def DL(is_first_pass,value):
+	if (is_first_pass):
+		return 1
+	return value
+
+def EQU(is_first_pass,value):
+	if (is_first_pass):
+		return 0
+	return ""
+
+def END(is_first_pass):
+	if (is_first_pass):
+		return 0
+	return ""
 
 def NOP(is_first_pass):
 	if (is_first_pass):
@@ -18,7 +39,7 @@ def NOP(is_first_pass):
 def LDBCNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "01" + dire
+	return "0184" + dire
 
 def LDBCA(is_first_pass):
 	if (is_first_pass):
@@ -90,7 +111,7 @@ def RRCA(is_first_pass):
 		return 1
 	return "0F"
 
-def DJNZDIS(is_first_pass):
+def DJNZe(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "10"
@@ -98,7 +119,7 @@ def DJNZDIS(is_first_pass):
 def LDDENN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "11" + dire
+	return "1184" + dire
 
 def LDDEA(is_first_pass):
 	if (is_first_pass):
@@ -130,7 +151,7 @@ def RLA(is_first_pass):
 		return 1
 	return "17"
 
-def JRDIS(is_first_pass):
+def JRe(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "18" + dire
@@ -170,7 +191,7 @@ def RRA(is_first_pass):
 		return 1
 	return "1F"
 
-def JRNZDIS(is_first_pass):
+def JRNZe(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "20" + dire
@@ -178,12 +199,12 @@ def JRNZDIS(is_first_pass):
 def LDHLNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "21" + dire
+	return "2184" + dire
 
 def LDNNHL(is_first_pass):
 	if (is_first_pass):
 		return 3
-	return "22"
+	return "2284"
 
 def INCHL(is_first_pass):
 	if (is_first_pass):
@@ -210,7 +231,7 @@ def DAA(is_first_pass):
 		return 1
 	return "27"
 
-def JRZDIS(is_first_pass):
+def JRZe(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "28" + dire
@@ -223,7 +244,7 @@ def ADDHLHL(is_first_pass):
 def LDHLNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "2A" + dire
+	return "2A84" + dire
 
 def DECHL(is_first_pass):
 	if (is_first_pass):
@@ -250,7 +271,7 @@ def CPL(is_first_pass):
 		return 1
 	return "2F"
 
-def JRNCDIS(is_first_pass):
+def JRNCe(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "30" + dire
@@ -260,10 +281,10 @@ def LDSPNN(is_first_pass, dire):
 		return 3
 	return "31" + dire
 
-def LDNNA(is_first_pass):
+def LDNNA(is_first_pass,dire):
 	if (is_first_pass):
 		return 3
-	return "32"
+	return "32"+dire
 
 def INCSP(is_first_pass):
 	if (is_first_pass):
@@ -290,7 +311,7 @@ def SCF(is_first_pass):
 		return 1
 	return "37"
 
-def JRCDIS(is_first_pass):
+def JRCe(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "38" + dire
@@ -2513,37 +2534,37 @@ def SET7A(is_first_pass):
 def ADDIXBC(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD09" + dire
 
 def ADDIXDE(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD19" + dire
 
 def LDIXNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DD21" + dire
 
 def LDNNIX(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DD22" + dire
 
-def INCIX(is_first_pass, dire):
+def INCIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD23"
 
 def ADDIXIX(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD24" + dire
 
-def LDIXNN(is_first_pass, dire):
+def LDIX_NN(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DD25" + dire
 
 def DECIX(is_first_pass, dire):
 	if (is_first_pass):
@@ -2613,32 +2634,32 @@ def LDIXdC(is_first_pass, dire):
 def LDIXdD(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD72" + dire
 
 def LDIXdE(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD73" + dire
 
 def LDIXdH(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD74" + dire
 
 def LDIXdL(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD75" + dire
 
 def LDIXdA(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD76" + dire
 
 def LDAIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD7E" + dire
 
 def ADDAIXd(is_first_pass, dire):
 	if (is_first_pass):
@@ -2690,10 +2711,10 @@ def EXSPIX(is_first_pass, dire):
 		return 2
 	return "DD" + dire
 
-def PUSHIX(is_first_pass, dire):
+def PUSHIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD"
 
 def JPIX(is_first_pass, dire):
 	if (is_first_pass):
@@ -2995,10 +3016,10 @@ def SBCHLSP(is_first_pass):
 		return 2
 	return "ED"
 
-def LDNNSP(is_first_pass):
+def LDNNSP(is_first_pass,dire):
 	if (is_first_pass):
 		return 4
-	return "ED"
+	return "ED"+dire
 
 def INAC(is_first_pass):
 	if (is_first_pass):
@@ -3120,10 +3141,10 @@ def LDNNIY(is_first_pass, dire):
 		return 4
 	return "FD" + dire
 
-def INCIY(is_first_pass, dire):
+def INCIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FD23"
 
 def ADDIYIY(is_first_pass, dire):
 	if (is_first_pass):
@@ -3268,7 +3289,7 @@ def ORIYd(is_first_pass, dire):
 def CPIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FDBE" + dire
 
 def POPIY(is_first_pass, dire):
 	if (is_first_pass):
@@ -3280,10 +3301,10 @@ def EXSPIY(is_first_pass, dire):
 		return 2
 	return "FD" + dire
 
-def PUSHIY(is_first_pass, dire):
+def PUSHIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FDE5"
 
 def JPIY(is_first_pass, dire):
 	if (is_first_pass):
@@ -3451,10 +3472,12 @@ def SET7IYd(is_first_pass, dire):
 	return "FD" + dire
 
 
-
 #MappnngOpcodes
-
 map_mnem = {
+	"DB N":DB,
+	"END":END,
+	"EQU N":EQU,
+	"DL N":DL,
 	"NOP":NOP,
 	"LD BC, NN":LDBCNN,
 	"LD (BC), A":LDBCA,
@@ -3471,7 +3494,7 @@ map_mnem = {
 	"DEC C":DECC,
 	"LD C, N":LDCN,
 	"RRCA":RRCA,
-	"DJNZ DIS":DJNZDIS,
+	"DJNZ e":DJNZe,
 	"LD DE, NN":LDDENN,
 	"LD (DE), A":LDDEA,
 	"INC DE":INCDE,
@@ -3479,7 +3502,7 @@ map_mnem = {
 	"DEC D":DECD,
 	"LD D, N":LDDN,
 	"RLA":RLA,
-	"JR DIS":JRDIS,
+	"JR e":JRe,
 	"ADD HL, DE":ADDHLDE,
 	"LD A, (DE)":LDADE,
 	"DEC DE":DECDE,
@@ -3487,7 +3510,7 @@ map_mnem = {
 	"DEC E":DECE,
 	"LD E, N":LDEN,
 	"RRA":RRA,
-	"JR NZ, DIS":JRNZDIS,
+	"JR NZ, e":JRNZe,
 	"LD HL, NN":LDHLNN,
 	"LD(NN), HL":LDNNHL,
 	"INC HL":INCHL,
@@ -3495,7 +3518,7 @@ map_mnem = {
 	"DEC H":DECH,
 	"LD H, N":LDHN,
 	"DAA":DAA,
-	"JR Z, DIS":JRZDIS,
+	"JR Z, e":JRZe,
 	"ADD HL, HL":ADDHLHL,
 	"LD (HL), (NN)":LDHLNN,
 	"DEC HL":DECHL,
@@ -3503,7 +3526,7 @@ map_mnem = {
 	"DEC L":DECL,
 	"LD L, N":LDLN,
 	"CPL":CPL,
-	"JR NC, DIS":JRNCDIS,
+	"JR NC, e":JRNCe,
 	"LD SP, NN":LDSPNN,
 	"LD (NN), A":LDNNA,
 	"INC SP":INCSP,
@@ -3511,13 +3534,13 @@ map_mnem = {
 	"DEC (HL)":DECHL,
 	"LD (HL), N":LDHLN,
 	"SCF":SCF,
-	"JR C, DIS":JRCDIS,
+	"JR C, e":JRCe,
 	"ADD HL, SP":ADDHLSP,
+	"LD A, N":LDAN,
 	"LD A, (NN)":LDANN,
 	"DEC SP":DECSP,
 	"INC A":INCA,
 	"DEC A":DECA,
-	"LD A,N":LDAN,
 	"CCF":CCF,
 	"LD B, B":LDBB,
 	"LD B, C":LDBC,
@@ -3583,22 +3606,22 @@ map_mnem = {
 	"LD A, L":LDAL,
 	"LD A, (HL)":LDAHL,
 	"LD A, A":LDAA,
-	"ADD A, B":ADDAB,
-	"ADD A, C":ADDAC,
-	"ADD A, D":ADDAD,
-	"ADD A, E":ADDAE,
-	"ADD A, H":ADDAH,
-	"ADD A, L":ADDAL,
-	"ADD A, (HL)":ADDAHL,
-	"ADD A, A":ADDAA,
-	"ADC A, B":ADCAB,
-	"ADC A, C":ADCAC,
-	"ADC A, D":ADCAD,
-	"ADC A, E":ADCAE,
-	"ADC A, H":ADCAH,
-	"ADC A, L":ADCAL,
-	"ADC A, (HL)":ADCAHL,
-	"ADC A, A":ADCAA,
+	"ADD B":ADDAB,
+	"ADD C":ADDAC,
+	"ADD D":ADDAD,
+	"ADD E":ADDAE,
+	"ADD H":ADDAH,
+	"ADD L":ADDAL,
+	"ADD (HL)":ADDAHL,
+	"ADD A":ADDAA,
+	"ADC B":ADCAB,
+	"ADC C":ADCAC,
+	"ADC D":ADCAD,
+	"ADC E":ADCAE,
+	"ADC H":ADCAH,
+	"ADC L":ADCAL,
+	"ADC (HL)":ADCAHL,
+	"ADC A":ADCAA,
 	"SUB B":SUBB,
 	"SUB C":SUBC,
 	"SUB D":SUBD,
@@ -3607,14 +3630,14 @@ map_mnem = {
 	"SUB L":SUBL,
 	"SUB (HL)":SUBHL,
 	"SUB A":SUBA,
-	"SBC A, B":SBCAB,
-	"SBC A, C":SBCAC,
-	"SBC A, D":SBCAD,
-	"SBC A, E":SBCAE,
-	"SBC A, H":SBCAH,
-	"SBC A, L":SBCAL,
-	"SBC A, (HL)":SBCAHL,
-	"SBC A, A":SBCAA,
+	"SBC B":SBCAB,
+	"SBC C":SBCAC,
+	"SBC D":SBCAD,
+	"SBC E":SBCAE,
+	"SBC H":SBCAH,
+	"SBC L":SBCAL,
+	"SBC (HL)":SBCAHL,
+	"SBC A":SBCAA,
 	"AND B":ANDB,
 	"AND C":ANDC,
 	"AND D":ANDD,
@@ -3660,7 +3683,7 @@ map_mnem = {
 	"JP Z, NN":JPZNN,
 	"CALL Z, NN":CALLZNN,
 	"CALL NN":CALLNN,
-	"ADC A, N":ADCAN,
+	"ADC N":ADCAN,
 	"RST 8":RST8,
 	"RET NC":RETNC,
 	"POP DE":POPDE,
@@ -3675,7 +3698,7 @@ map_mnem = {
 	"JP C, NN":JPCNN,
 	"IN A, (N)":INAN,
 	"CALL C, N":CALLCN,
-	"SBC A, N":SBCAN,
+	"SBC N":SBCAN,
 	"RST 18H":RST18H,
 	"RET PO":RETPO,
 	"POP HL":POPHL,
@@ -3961,7 +3984,7 @@ map_mnem = {
 	"LD (NN), IX":LDNNIX,
 	"INC IX":INCIX,
 	"ADD IX, IX":ADDIXIX,
-	"LD IX, (NN)":LDIXNN,
+	"LD IX, (NN)":LDIX_NN,
 	"DEC IX":DECIX,
 	"INC (IX + d)":INCIXd,
 	"DEC (IX + d)":DECIXd,
@@ -4144,3 +4167,4 @@ map_mnem = {
 	"SET 6, (IY + d)":SET6IYd,
 	"SET 7, (IY + d)":SET7IYd,
 }
+
