@@ -133,7 +133,7 @@ class MainApplication:
 		while(self.macroCicles()):
 			self.filename = self.directory + "out"+ str(self.cicle) +".ASM"
 			self.cicle += 1
-
+		self.cicle += 1
 
 		self.newWindow = tk.Toplevel(self.master)
 		self.pop = PopUP(self.newWindow)
