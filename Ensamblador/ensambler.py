@@ -17,7 +17,6 @@ class Ensambler(object):
 			terms 		(list)		: Lista de terminos de la instrucción
 			TS 			(HashTable) : Tabla de simbolos
 			CO 			(list)		: Codigo Objeto
-			valid 		(boolean)	: Variable booleana para confirmar que la primera pasada se completo
 			valid_sintx (boolean)	: Variable booleana	para confirmar la sintaxis de la instrucción
 			"""
 
@@ -36,7 +35,6 @@ class Ensambler(object):
 		self.terms = []
 		self.TS = {}
 		self.CO = []
-		self.valid = True
 		self.valid_sintx = True
 
 	""" 
@@ -136,10 +134,8 @@ class Ensambler(object):
 					self.instruction = self.instruction + " " + op1
 
 				elif num_ter > 2:
-					##ERROR 
-					print("Error numero de terminas mayor a 2")
-					self.valid = False
-					break
+					messag = "Error numero de terminas mayor a 2"
+					raise Exception(messag)
 
 				if band:
 					size = mne.map_mnem.get(self.instruction,None)(True,"0000")
@@ -147,29 +143,22 @@ class Ensambler(object):
 					size = mne.map_mnem.get(self.instruction,None)(True)
 
 				if size == None:
-					## Puedes decir que instruccion apartir de self.intruccion 
-					##Error intruccion desconocida
-					##Verifique la intruccion o los terminos a operar
-					break
+					messag = "Error intruccion desconocida \n Verifique la intruccion o los terminos a operar"
+					raise Exception(messag)
 				
 				aux =  hex(self.cl)[2:].upper()
 				self.list_cl.append("0000"[len(aux):] + aux)
 				self.cl += size
 
 			else:
-				##eRROR
-				# SINTAXIS MAL 
-				# puedes mostrar la instruccion para que se veo mejor cheque el manual
-				self.valid = False
-				break
+				messag = "Error en sitaxis: " + line
+				raise Exception(messag)
 
 
 		self.size = hex(self.cl-1)[2:]
 		self.dir_in_c = self.list_cl[0]
 		self.CO.append(self.size)
 		self.CO.append(self.dir_in_c)
-		print(self.TS)
-		print(self.list_cl)
 
 	""" 
 	Segunda pasada del ensamblador.
@@ -180,197 +169,185 @@ class Ensambler(object):
 	def Second_pass(self):
 		num = "00"
 		cont = 2
-		if self.valid:
-			for line in self.fileLines:
-				self.clean_line(line)
-				self.get_label(False)
-				if self.valid_sintx:
-					num_ter = self.get_terms()
+		for line in self.fileLines:
+			self.clean_line(line)
+			self.get_label(False)
+			if self.valid_sintx:
+				num_ter = self.get_terms()
 
-					if num_ter == 2:
+				if num_ter == 2:
+					aux = self.terms[0]
+					aux2 = self.terms[1]
+					dire = ""
+					dire2 = ""
+
+					if self.terms[0][1:-1] in self.TS.keys():
+						aux = "(nn)"
+						dire = self.TS[self.terms[0][1:-1]]
+						dire = dire[2:]+dire[:-2]
+
+					if self.terms[0] in  mne.v_ops and self.terms[1] in  mne.v_ops:
 						aux = self.terms[0]
 						aux2 = self.terms[1]
-						dire = ""
-						dire2 = ""
 
-						if self.terms[0][1:-1] in self.TS.keys():
-							aux = "(nn)"
-							dire = self.TS[self.terms[0][1:-1]]
-							dire = dire[2:]+dire[:-2]
+					elif self.terms[0][:4] == "(IX+":
+						aux = "(IX+d)"
+						dire = self.terms[0][4:-2]
+						dire = dire[2:]+dire[:-2]
 
-						if self.terms[0] in  mne.v_ops and self.terms[1] in  mne.v_ops:
-							aux = self.terms[0]
-							aux2 = self.terms[1]
+					elif self.terms[0][:4] == "(IY+":
+						aux = "(IY+d)"
+						dire = self.terms[0][4:-2]
+						dire = dire[2:]+dire[:-2]
 
-						elif self.terms[0][:4] == "(IX+":
-							aux = "(IX+d)"
-							dire = self.terms[0][4:-2]
-							dire = dire[2:]+dire[:-2]
+					elif self.terms[0][1:-1].isalnum():
+						aux = "(nn)"
+						dire = self.terms[0][1:-2]
+						dire = dire[2:]+dire[:-2]
 
-						elif self.terms[0][:4] == "(IY+":
-							aux = "(IY+d)"
-							dire = self.terms[0][4:-2]
-							dire = dire[2:]+dire[:-2]
+					elif self.terms[1].isdigit():
+						aux2 = "n"
+						dire2 = self.terms[1]
 
-						elif self.terms[0][1:-1].isalnum():
-							aux = "(nn)"
-							dire = self.terms[0][1:-2]
-							dire = dire[2:]+dire[:-2]
+					elif self.terms[1][1:-1] in self.TS.keys():
+						aux2 = "(nn)"
+						dire2 = self.TS[self.terms[1][1:-1]]
+						dire2 = dire2[2:]+dire2[:-2]
 
-						elif self.terms[1].isdigit():
-							aux2 = "n"
-							dire2 = self.terms[1]
+					elif self.terms[1] in self.TS.keys():
+						aux2 = "nn"
+						dire2 = self.TS[self.terms[1]]
 
-						elif self.terms[1][1:-1] in self.TS.keys():
-							aux2 = "(nn)"
-							dire2 = self.TS[self.terms[1][1:-1]]
-							dire2 = dire2[2:]+dire2[:-2]
+					elif self.instruction == "JP":
+						aux2 = "nn"
+						dire2 = self.TS[self.terms[1]]
+						dire2 = dire2[2:]+dire2[:-2]
 
-						elif self.terms[1] in self.TS.keys():
-							aux2 = "nn"
-							dire2 = self.TS[self.terms[1]]
+					elif self.instruction == "JR":
+						aux2 = "e"
+						dire2 = self.TS[self.terms[1]]
+						direnew = int(dire2,16)
+						direact = int(str(self.list_cl[cont+1]),16)
+						dire2 = direnew-direact
+						if dire2 < 0:
+							dire2 =bin(dire2)[3:]
+							dire2 = "00000000"[len(dire2):] + dire2
+							pos = 0
+							dire1 = ""
+							for char in dire2:
+								if char == '0':
+									dire1 += '1'
+								else:
+									dire1 += dire2[pos:]
+									break
+								pos+=1
 
-						elif self.instruction == "JP":
-							aux2 = "nn"
-							dire2 = self.TS[self.terms[1]]
-							dire2 = dire2[2:]+dire2[:-2]
-
-						elif self.instruction == "JR":
-							aux2 = "e"
-							dire2 = self.TS[self.terms[1]]
-							direnew = int(dire2,16)
-							direact = int(str(self.list_cl[cont+1]),16)
-							dire2 = direnew-direact
-							if dire2 < 0:
-								dire2 =bin(dire2)[3:]
-								dire2 = "00000000"[len(dire2):] + dire2
-								pos = 0
-								dire1 = ""
-								for char in dire2:
-									if char == '0':
-										dire1 += '1'
-									else:
-										dire1 += dire2[pos:]
-										break
-									pos+=1
-
-								dire2 = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
-							else:
-								dire2 = hex(dire2)[2:]
-
-						elif self.terms[1][1:-1].isalnum():
-							aux2 = "(nn)"
-							dire2 = self.terms[0][1:-2]
-							dire2 = dire2[2:]+dire2[:-2]
-
-						self.instruction = self.instruction + " " + aux + "," + aux2
-
-						if dire != "" or dire2 != "":
-							code = mne.map_mnem.get(self.instruction,"Error")(False,dire+dire2)
-
+							dire2 = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
 						else:
-							code = mne.map_mnem.get(self.instruction,"Error")(False)
+							dire2 = hex(dire2)[2:]
 
-					elif num_ter == 1:
+					elif self.terms[1][1:-1].isalnum():
+						aux2 = "(nn)"
+						dire2 = self.terms[0][1:-2]
+						dire2 = dire2[2:]+dire2[:-2]
+
+					self.instruction = self.instruction + " " + aux + "," + aux2
+
+					if dire != "" or dire2 != "":
+						code = mne.map_mnem.get(self.instruction,"Error")(False,dire+dire2)
+
+					else:
+						code = mne.map_mnem.get(self.instruction,"Error")(False)
+
+				elif num_ter == 1:
+					aux = self.terms[0]
+					dire = ""
+
+					if self.terms[0][1:-1] in self.TS.keys():
+						aux = "(nn)"
+						dire = self.TS[self.terms[0][1:-1]]
+						dire = dire[2:]+dire[:-2]
+
+					if self.terms[0] in  mne.v_ops:
 						aux = self.terms[0]
-						dire = ""
 
-						if self.terms[0][1:-1] in self.TS.keys():
-							aux = "(nn)"
-							dire = self.TS[self.terms[0][1:-1]]
-							dire = dire[2:]+dire[:-2]
+					elif self.terms[0][:4] == "(IX+":
+						aux = "(IX+d)"
+						dire = self.terms[0][4:-2]
+						dire = dire[2:]+dire[:-2]
 
-						if self.terms[0] in  mne.v_ops:
-							aux = self.terms[0]
+					elif self.terms[0][:4] == "(IY+":
+						aux = "(IY+d)"
+						dire = self.terms[0][4:-2]
+						dire = dire[2:]+dire[:-2]
 
-						elif self.terms[0][:4] == "(IX+":
-							aux = "(IX+d)"
-							dire = self.terms[0][4:-2]
-							dire = dire[2:]+dire[:-2]
+					elif self.terms[0][1:-1].isalnum():
+						aux = "(nn)"
+						dire = self.terms[0][1:-2]
+						dire = dire[2:]+dire[:-2]
 
-						elif self.terms[0][:4] == "(IY+":
-							aux = "(IY+d)"
-							dire = self.terms[0][4:-2]
-							dire = dire[2:]+dire[:-2]
+					elif self.instruction == "DL":
+						x = str(self.TS.get(self.terms[0],None))
 
-						elif self.terms[0][1:-1].isalnum():
-							aux = "(nn)"
-							dire = self.terms[0][1:-2]
-							dire = dire[2:]+dire[:-2]
+					elif self.instruction == "JP":
+						aux = "nn"
+						dire = str(self.TS.get(self.terms[0],None))
+						dire = dire[2:]+dire[:-2]
 
-						elif self.instruction == "DL":
-							x = str(self.TS.get(self.terms[0],None))
-
-						elif self.instruction == "JP":
-							aux = "nn"
-							dire = str(self.TS.get(self.terms[0],None))
-							dire = dire[2:]+dire[:-2]
-
-						elif self.instruction == "JR":
-							aux2 = "e"
-							dire = self.TS[self.terms[0]]
-							direnew = int(dire2,16)
-							direact = int(str(self.list_cl[cont+1]),16)
-							dire = direnew - direact
-							if dire2 < 0:
-								dire2 =bin(dire2)[3:]
-								dire2 = "00000000"[len(dire2):] + dire2
-								pos = 0
-								dire1 = ""
-								for char in dire2:
-									if char == '0':
-										dire1 += '1'
-									else:
-										dire1 += dire2[pos:]
-										break
-									pos+=1
-
-								dire = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
-							else:
-								dire = hex(dire2)[2:]
-
-						elif self.terms[0][1:-1].isalnum():
-							aux = "(nn)"
-							dire = self.terms[0][1:-2]
-							dire = dire[2:]+dire[:-2]
-						
-						elif self.terms[0].isdigit():
-							aux = "n"
-							dire = "00"[len(self.terms[0]):]+self.terms[0]
-
-						
-						self.instruction = self.instruction + " "+ aux
-
-						if dire != "":
-
-							code = mne.map_mnem.get(self.instruction,None)(False,dire)
+					elif self.instruction == "JR":
+						aux2 = "e"
+						dire = self.TS[self.terms[0]]
+						direnew = int(dire2,16)
+						direact = int(str(self.list_cl[cont+1]),16)
+						dire = direnew - direact
+						if dire2 < 0:
+							dire2 =bin(dire2)[3:]
+							dire2 = "00000000"[len(dire2):] + dire2
+							pos = 0
+							dire1 = ""
+							for char in dire2:
+								if char == '0':
+									dire1 += '1'
+								else:
+									dire1 += dire2[pos:]
+									break
+								pos+=1
+							dire = (hex(int(dire1[:4],2))[2:] + hex(int(dire1[4:],2))[2:]).upper()
 						else:
-							code = mne.map_mnem.get(self.instruction,None)(False)
+							dire = hex(dire2)[2:]
 
-					if num_ter == 0:
+					elif self.terms[0][1:-1].isalnum():
+						aux = "(nn)"
+						dire = self.terms[0][1:-2]
+						dire = dire[2:]+dire[:-2]
+						
+					elif self.terms[0].isdigit():
+						aux = "n"
+						dire = "00"[len(self.terms[0]):]+self.terms[0]
+	
+					self.instruction = self.instruction + " "+ aux
+
+					if dire != "":
+
+						code = mne.map_mnem.get(self.instruction,None)(False,dire)
+					else:
 						code = mne.map_mnem.get(self.instruction,None)(False)
 
-					if code == None:
-						## Puedes decir que instruccion apartir de "self.intruccion" y la linea con "cont"
-						##Error intruccion desconocida
-						##Verifique la intruccion o los terminos a operar
-						break
+				if num_ter == 0:
+					code = mne.map_mnem.get(self.instruction,None)(False)
 
-					self.CO.append(code)
-					cont += 1
+				if code == None:
+					messag = "Intruccion desconocida: " + self.intruccion + "\nError en la primera pasada no completada"
+					raise Exception(messag)
 
-				else:
-					##eRROR
-					# SINTAXIS MAL
-					# puedes mostrar la instruccion para que se veo mejor cheque el manual
-					self.valid = False
-					break
-		else:
-			##eRROR primera pasda incompleta error en sintaxis
-			print("Error en la primera pasada no completada")
+				self.CO.append(code)
+				cont += 1
+
+			else:
+				messag = "Intruccion desconocida: " + line + "\nError en la primera pasada no completada"
+				raise Exception(messag)
 
 		self.CO.append(self.dir_in_e)
-		print(self.CO)
 
 
 	"""
@@ -395,8 +372,8 @@ class Ensambler(object):
 		if len(label) > 1:
 
 			if label[0] in mne.v_ops or label[0] in mne.map_mnem:
-				##Error si usa una etiqueta con palabras reservadas
-				print("Error etiqueta invalida")
+				messag = "Error etiqueta invalida"
+				raise Exception(messag)
 
 			if first_pass:
 				if label[1].strip()[:3] == "EQU":
@@ -408,9 +385,8 @@ class Ensambler(object):
 					aux = num[len(aux):]+aux
 
 				if label[0].strip() in self.TS:
-					##Error valor definido en la tabla puedes mostrar cual con label[0]
-					print("Error valor repetido en la tabla")
-					self.valid_sintx = False
+					messag = "Error valor repetido en la tabla"
+					raise Exception(messag)
 
 				else:
 					self.TS[label[0].strip()] = aux
@@ -431,13 +407,3 @@ class Ensambler(object):
 			self.instruction = self.terms[0]
 			del self.terms[0]
 		return len(self.terms)
-
-	
-aux = Ensambler("1.txt")
-aux.leerArchivo()
-aux.first_pass()
-aux.Second_pass()
-fileOut = open ("1.co", "w+")
-for line in aux.CO:
-	fileOut.write(line)
-fileOut.close()

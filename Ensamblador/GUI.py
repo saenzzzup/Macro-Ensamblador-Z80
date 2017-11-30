@@ -75,13 +75,8 @@ class MainApplication:
 			scale = '400x300'
 			)
 
-	def ensamblar(self):
-		pass
-
-	def macroEnsamblar(self):
-	
+	def fileOpener(self):
 		self.filename = filedialog.askopenfilename() #Agregar excepcion
-		
 		if not self.filename:
 			self.newWindow = tk.Toplevel(self.master)
 			self.pop = PopUP(self.newWindow)
@@ -91,14 +86,39 @@ class MainApplication:
 		if os.name == 'nt':
 			self.directory = self.filename[:self.filename.rfind("\\")] + "\\Out\\"
 		else:
-			self.directory = self.filename[:self.filename.rfind("/")] + "/Out/"
-		
+			self.directory = self.filename[:self.filename.rfind("/")] + "/Out/"	
 
 		try:
 			os.makedirs(self.directory)
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
+
+	def ensamblar(self):
+
+		self.fileOpener()
+
+		ens = Ensambler(self.filename)
+		ens.leerArchivo()
+
+
+		try:
+			ens.first_pass()
+			ens.Second_pass()
+		except Exception as ex: 
+			self.newWindow = tk.Toplevel(self.master)
+			self.pop = PopUP(self.newWindow)
+			self.pop.addMessage("Error", str(ex))
+			return
+
+		fileOut = open ("out.co", "w+")
+		for line in aux.CO:
+			fileOut.write(line)
+		fileOut.close()
+
+	def macroEnsamblar(self):
+	
+		self.fileOpener()
 
 		while(self.macroCicles()):
 			self.filename = self.directory + "out"+ str(self.cicle) +".ASM"
