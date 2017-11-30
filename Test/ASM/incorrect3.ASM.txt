@@ -1,0 +1,55 @@
+LD IX,1000H; En esta dirección se encuentra la palabra que copiaremos.
+LD IY,2000H; En esta dirección copiaremos la palabra
+LD A,(1500H); Dirección del tamaño de la palabra a copiar.
+LD B,A; B ES TAMAÑO DE LA PALABRA
+LD H,B
+LD A,(1501H); Dirección del tamaño del bloque donde queremos copiar
+LD D,A; D ES TAMAÑO DEL BLOQUE
+LD E,D
+LD L,D
+INC L
+CP B
+JP M,ETI1; Caso error.
+ETI3: LD A,(IY+0); Ponemos el contenido de IY en el registro A.
+CP 1;  Comparamos para ver si está o no vacío.
+JP P,ETI2;Si no está vacía esa localidad vamos a eti2.
+INC IY;Buscamos en el bloque si hay localidades no vacías.
+DEC D
+LD A D
+CP 1
+JP P,ETI3;Ciclo para buscar localidades vacías.
+JP ETI6;  Cuando el ciclo termine vamos directo a eti6.
+ETI2: LD IY,2000H; Si se encuentra alguna localidad con elementos en ella reiniciamos el índice IY.
+ETI4: INC IY;Recorremos el bloque hasta llegar al último elemento.
+DEC E 
+LD A,E
+CP 1
+JP P,ETI4;Ciclo de recorrido de bloque.
+LD A,(1501H);Inicializamos E con el valor del tamaño del bloque.
+LD E,A
+INC E
+ETI5: LD A,(IY+0); Cuando se termine de recorrer el bloque se meterán a la pila los elementos de éste.
+PUSH AF;  Los elementos se meterán a la pila de manera inversa para que al sacarlos estén ordenados.
+DEC E
+LD A,E
+CP 1
+JP P,ETI5;Ciclo de llenado de pila.
+JP ETI6;  Cuando la pila se haya terminado de llenar vamos directo a eti6.
+ETI6: LD IY,2000H; Reiniciamos la dirección de IY para pegar lo copiado.
+ETI7: LD A,(IX+0); Pegamos la palabra copiada.
+INC IX
+INC IY
+DEC H; Contador que nos indica hasta donde copiar (tamaño palabra).
+LD A,H
+CP 1
+JP P,ETI7;Ciclo de pegar palabra.
+ETI8: POP AF;  Una vez terminado el pegado, sacamos de la pila los elementos a recorrer.;Ponemos los elementos depués de la palabra copiada.
+INC IY
+DEC L
+LD A,L
+CP 1A
+JP P,ETI8;  Ciclo de recorrer.
+HALT; Una vez recorrido el texto, termina el proceso.
+ETI1: LD A,99; Caso error. Si la palabra es más grande que el bloque donde queremos copiar terminará el proceso.
+LD (1510H),A
+HALT

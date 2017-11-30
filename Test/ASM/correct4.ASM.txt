@@ -1,0 +1,6 @@
+   LD A,(1000H)
+   LD B,A 
+   LD A,(3000H)
+   CP B
+   LD E,A    
+   LD D,B
