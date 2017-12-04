@@ -1,0 +1,25 @@
+   x:DB 5 ; dsdgs
+   Y: DB 3 ;dhdhf
+   z: DB 0
+CERO : EQU 00 ;fdhjsfdkkjsdfg 
+inicio:   LD A,(x)
+   CP CERO
+   JP Z,eti1
+   LD B,A 
+   LD A,(Y)
+   CP CERO
+   JR Z,eti1 ;dhjdfkhkjd
+   CP B
+   JP P,eti2 ;dsgkdggd
+   LD E,A    
+   LD D,B
+   JP eti3    ;dsfhjdshfj	
+eti2: LD E,B
+   LD D,A
+eti3: LD A,CERO;;;;djhdsjh
+eti4: ADD D
+   DEC E
+   JR NZ, eti4
+eti1: LD (z),A
+   HALT
+   END inicio

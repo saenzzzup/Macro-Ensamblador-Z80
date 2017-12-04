@@ -1,0 +1,57 @@
+   LD IX,1000H;   Con el índice IX apuntamos a la dirección 1000H, ahí se encuentra la palabra cuyas ocurrencias buscaremos.
+   LD IY,2000H;   Con el índice IY apuntamos a la dirección 2000H, ahí se encuentra el bloque donde buscaremos las ocurrencias de la palabra.
+   LD A,(3001H);  Guardamos el contenido de la dirección 3001 en el registro A, ahora A contiene el tamaño del bloque donde buscaremos.
+   LD B,A; 
+   LD C,0;        En el registro C guardamos el valor de 0, este registro nos servirá como contador de concurrencias.
+   LD A,(3000H);  Guardamos el contenido de la dirección 3000 en el registro A, contiene el tamaño de la palabra.
+   LD L,A;        Copiamos al valor anterior en el registro L.
+   LD D,L;        Copiamos una vez más el valor pero esta vez en el registro D.
+   CP B;          Comparamos si el tamaño de la palabra es mayor que el del bloque donde buscaremos.
+   JP P,ETI1;     Si el tamaño de la palabra es mayor saltamos a la etiqueta 1.
+ETI3: LD A,(IX+0); En A guardamos el contenido de la localidad apuntada por el índice IX.
+   CP (IY+0);     Comparamos con el contenido de IY, con el propósito de ver si existe una ocurrencia en la primera letra o no.
+   JP Z,ETI2;     En caso de que exista ocurrencia, saltamos a la etiqueta 2, si no continuamos con el proceso.
+   INC IY;        Si n existe ocurrencia, incrementamos el índice Y.
+   DEC B;         Decrementamos el valor de B, que contiene el tamaño del bloque. Esto con el propósito de saber cuantas letras del bloque hemos comparado. 
+   LD A,B;        Pasamos el valor de B a A para realizar una comparación.
+   CP 1;          Comparamos con 1 para ver si B es igual a 0.
+   JP P,ETI3;     En caso de que no sea 0, saltamos a la etiqueta 3, es decir, repetimos las instrucciones anteriores y se forma un ciclo.
+   LD A,C;        Si es 0, pasamos directamente el valor de las ocurrencias hasta el momento al registro A para poder manipular el valor.
+   LD (3050H),A;  En la dirección 3050 ponemos el valor de nuestras ocurrencias.
+   LD A,(3000H)
+   JP ETI5 
+ETI2: PUSH IY
+   INC IX;     Saltamos a esta etiqueta en caso de que haya ocurrencias. Incrementamos el valor del índice IX para movernos a la siguiente letra de la palabra. 
+   INC IY;        Incrementamos el valor del índice IY para movernos a la siguiente letra del boque.
+   DEC B;         Decrementamos el valor del tamaño del bloque.
+   DEC D;         Decrementamos el valor del tamaño del bloque.
+   LD A,D; 
+   CP 1
+   JP P,ETI3;     En caso de que el valor del tamaño de la palabra sea 0 siginifica que ya la recorrimos toda, si es 0 seguimos el proceso, si no saltamos a la etiqueta 3.
+   INC C; Incrementamos el contador de ocurrencias ya que como el tamaño de la palabra se hizo 0 la recorrimos toda y se encuentra en el bloque.
+   LD A,B
+   CP 1
+   JP P,ETI4;     Ahora vemos si terminamos de recorrer el bloque donde uscamos ocurrencias. Si no saltamos a la etiqueta 4.
+   LD A,C
+   LD (3050H),A;  Como siguió el proceso quiere decir que terminamos de recorrer el bloque y guardamos en la dirección 3050 el valor de ls ocurrencias.
+ETI6: LD A,(3000H)
+   JP ETI5
+ETI4: LD IX,1000H; Si el bloque aún no ha sido recorrido por completo y la palabra ya, reiniciamos el índice IX para comenzar la búsqueda otra vez.
+   LD D,L
+   JP ETI3;       Hacemos un salto incondicional a la etiqueta 3.
+ETI1: LD A,C;     Este es el caso en el que la palabra es mayor que el bloque y por lo tanto las ocurrencias son igual a cero.
+   LD (3050H),A
+   HALT
+ETI5: POP DE;     Esta etiqueta nos ayudará a guardar las direcciones donde se encuentran las ocurrencias.
+   DEC A;         Sacamos de la pila la dirección guardada y decrementamos nuestro contador.
+   CP 1
+   JP P,ETI5;     Vaciamos el contenido de la pila hasta sacar la primera direccion introducida.
+   LD (IX+50H),D; Ponemos en una localidad la dirección mencionada.
+   INC IX;        Incrementamos nuestro índice para evitar traslape.
+   LD (IX+50H),E
+   INC IX
+   DEC C;         Decrementamos el contador que nos indicará cuantas veces realizaremos lo anterior.
+   LD A,C
+   CP 1
+   JP P,ETI6
+   HALT
