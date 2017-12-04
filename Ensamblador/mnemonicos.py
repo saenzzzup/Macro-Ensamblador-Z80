@@ -1,15 +1,28 @@
-# -*- coding: utf-8 -*-
+
 #ValidOperands
 v_ops=[
 "A","B","C","D","E","H","L","R","I","BC","DE","HL","AF","AF'","SP","IX","IY",
-"NZ","Z","NC","C","PQ","PE","P","M","(HL)","(IX)","(IY)","(BC)","(DE)","(SP)","(C)"
+"NZ","Z","NC","C","PO","PE","P","M","(HL)","(BC)","(DE)","(SP)","(C)", "(IX)","(IY)","PE"
 ]
-v_op = ["LD","PUSH","POP","EX","EXX","LDI","LDIR","LDD","LDDR","CPI","CPIR","CPD",
+
+#ValidMnemonicos
+v_mnemonicos = ["LD","PUSH","POP","EX","EXX","LDI","LDIR","LDD","LDDR","CPI","CPIR","CPD",
 "CPDR","ADD","ADC","SUB","SBC","AND","OR","XOR","CP","INC","DEC","DAA","CPL","NEG",
 "CCF","SCF","NOP","HALT","DI","EI","IM","RLCA","RLA","RRCA","RRA","RLC","RL","RRC",
 "RR","SLA","SRA","SRL","RLD","RRD","BIT","SET","RES","JP","JR","DJNZ","CALL","RET",
-"RETI","RETN","RST","IN","INI","INIR","IND","INDR","OUT","OUTI","OUTIR","OUTD","OTDR"
+"RETI","RETN","RST","IN","INI","INIR","IND","INDR","OUT","OUTI","OUTIR","OUTD","OTDR",
+"ORG","END","DB","DW","DL","EQU","LS","OTIR","CPDR"
 ]
+
+#Valid directives
+v_directives = ["ORG","END","DB","DW","DL","EQU"]
+
+mne_aux = ["BIT","RES","SET"]
+
+p = {"00":"000","08": "001", "10": "010", "18": "011", "20":"100", "28":"101","30": "110", "38": "111"}
+
+b = {"0":"000","1": "001", "2": "010", "3": "011", "4":"100", "5":"101","6": "110", "7": "111"}
+
 
 def DB(is_first_pass,value):
 	if (is_first_pass):
@@ -26,7 +39,7 @@ def EQU(is_first_pass,value):
 		return 0
 	return ""
 
-def END(is_first_pass):
+def END(is_first_pass,value):
 	if (is_first_pass):
 		return 0
 	return ""
@@ -39,7 +52,7 @@ def NOP(is_first_pass):
 def LDBCNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "0184" + dire
+	return "01" + dire
 
 def LDBCA(is_first_pass):
 	if (is_first_pass):
@@ -111,15 +124,15 @@ def RRCA(is_first_pass):
 		return 1
 	return "0F"
 
-def DJNZe(is_first_pass,dire):
+def DJNZNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
-	return "10"
+	return "10"+ dire
 
 def LDDENN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "1184" + dire
+	return "11" + dire
 
 def LDDEA(is_first_pass):
 	if (is_first_pass):
@@ -151,7 +164,7 @@ def RLA(is_first_pass):
 		return 1
 	return "17"
 
-def JRe(is_first_pass,dire):
+def JRNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "18" + dire
@@ -191,7 +204,7 @@ def RRA(is_first_pass):
 		return 1
 	return "1F"
 
-def JRNZe(is_first_pass,dire):
+def JRNZNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "20" + dire
@@ -199,12 +212,12 @@ def JRNZe(is_first_pass,dire):
 def LDHLNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "2184" + dire
+	return "21" + dire
 
-def LDNNHL(is_first_pass):
+def LD_NN_HL(is_first_pass,dire):
 	if (is_first_pass):
 		return 3
-	return "2284"
+	return "22" + dire
 
 def INCHL(is_first_pass):
 	if (is_first_pass):
@@ -231,7 +244,7 @@ def DAA(is_first_pass):
 		return 1
 	return "27"
 
-def JRZe(is_first_pass,dire):
+def JRZNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "28" + dire
@@ -241,10 +254,10 @@ def ADDHLHL(is_first_pass):
 		return 1
 	return "29"
 
-def LDHLNN(is_first_pass, dire):
+def LDHL_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "2A84" + dire
+	return "2A" + dire
 
 def DECHL(is_first_pass):
 	if (is_first_pass):
@@ -271,7 +284,7 @@ def CPL(is_first_pass):
 		return 1
 	return "2F"
 
-def JRNCe(is_first_pass,dire):
+def JRNCNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "30" + dire
@@ -281,7 +294,7 @@ def LDSPNN(is_first_pass, dire):
 		return 3
 	return "31" + dire
 
-def LDNNA(is_first_pass,dire):
+def LD_NN_A(is_first_pass,dire):
 	if (is_first_pass):
 		return 3
 	return "32"+dire
@@ -291,12 +304,12 @@ def INCSP(is_first_pass):
 		return 1
 	return "33"
 
-def INCHL(is_first_pass):
+def INC_HL_(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "34"
 
-def DECHL(is_first_pass):
+def DEC_HL_(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "35"
@@ -311,7 +324,7 @@ def SCF(is_first_pass):
 		return 1
 	return "37"
 
-def JRCe(is_first_pass,dire):
+def JRCNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "38" + dire
@@ -321,7 +334,7 @@ def ADDHLSP(is_first_pass):
 		return 1
 	return "39"
 
-def LDANN(is_first_pass, dire):
+def LDA_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
 	return "3A" + dire
@@ -371,17 +384,17 @@ def LDBE(is_first_pass):
 		return 1
 	return "43"
 
-def LDBHNN(is_first_pass, dire):
+def LDBH(is_first_pass):
 	if (is_first_pass):
 		return 1
-	return "44" + dire
+	return "44"
 
 def LDBL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "45"
 
-def LDBHL(is_first_pass):
+def LDB_HL_(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "46"
@@ -671,82 +684,82 @@ def LDAA(is_first_pass):
 		return 1
 	return "7F"
 
-def ADDAB(is_first_pass):
+def ADDB(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "80"
 
-def ADDAC(is_first_pass):
+def ADDC(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "81"
 
-def ADDAD(is_first_pass):
+def ADDD(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "82"
 
-def ADDAE(is_first_pass):
+def ADDE(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "83"
 
-def ADDAH(is_first_pass):
+def ADDH(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "84"
 
-def ADDAL(is_first_pass):
+def ADDL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "85"
 
-def ADDAHL(is_first_pass):
+def ADDHL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "86"
 
-def ADDAA(is_first_pass):
+def ADDA(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "87"
 
-def ADCAB(is_first_pass):
+def ADCB(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "88"
 
-def ADCAC(is_first_pass):
+def ADCC(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "89"
 
-def ADCAD(is_first_pass):
+def ADCD(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "8A"
 
-def ADCAE(is_first_pass):
+def ADCE(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "8B"
 
-def ADCAH(is_first_pass):
+def ADCH(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "8C"
 
-def ADCAL(is_first_pass):
+def ADCL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "8D"
 
-def ADCAHL(is_first_pass):
+def ADCHL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "8E"
 
-def ADCAA(is_first_pass):
+def ADCA(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "8F"
@@ -791,42 +804,42 @@ def SUBA(is_first_pass):
 		return 1
 	return "97"
 
-def SBCAB(is_first_pass):
+def SBCB(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "98"
 
-def SBCAC(is_first_pass):
+def SBCC(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "99"
 
-def SBCAD(is_first_pass):
+def SBCD(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "9A"
 
-def SBCAE(is_first_pass):
+def SBCE(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "9B"
 
-def SBCAH(is_first_pass):
+def SBCH(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "9C"
 
-def SBCAL(is_first_pass):
+def SBCL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "9D"
 
-def SBCAHL(is_first_pass):
+def SBCHL(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "9E"
 
-def SBCAA(is_first_pass):
+def SBCA(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "9F"
@@ -976,7 +989,7 @@ def CPH(is_first_pass):
 		return 1
 	return "BC"
 
-def CPL(is_first_pass):
+def CP_L(is_first_pass):
 	if (is_first_pass):
 		return 1
 	return "BD"
@@ -1021,15 +1034,23 @@ def PUSHBC(is_first_pass):
 		return 1
 	return "C5"
 
-def ADDAN(is_first_pass, dire):
+def ADDN(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
 	return "C6" + dire
 
-def RST0(is_first_pass):
+## 000H 08H 10H 18H 20H 28H 30H 38H
+def RSTNN(is_first_pass,dire):
 	if (is_first_pass):
 		return 1
-	return "C7"
+	else:
+		if dire in p.keys():
+			dire = "11" + p[dire] + "111"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+
+	return dire
 
 def RETZ(is_first_pass):
 	if (is_first_pass):
@@ -1056,15 +1077,10 @@ def CALLNN(is_first_pass, dire):
 		return 3
 	return "CD" + dire
 
-def ADCAN(is_first_pass, dire):
+def ADCN(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
 	return "CE" + dire
-
-def RST8(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "CF"
 
 def RETNC(is_first_pass):
 	if (is_first_pass):
@@ -1081,7 +1097,7 @@ def JPNCNN(is_first_pass, dire):
 		return 3
 	return "D2" + dire
 
-def OUTNA(is_first_pass):
+def OUTNA(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
 	return "D3"
@@ -1101,11 +1117,6 @@ def SUBN(is_first_pass, dire):
 		return 2
 	return "D6" + dire
 
-def RST10H(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "D7"
-
 def RETC(is_first_pass):
 	if (is_first_pass):
 		return 1
@@ -1121,25 +1132,20 @@ def JPCNN(is_first_pass, dire):
 		return 3
 	return "DA" + dire
 
-def INAN(is_first_pass, dire):
+def INA_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
 	return "DB" + dire
 
-def CALLCN(is_first_pass, dire):
+def CALLCNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
 	return "DC" + dire
 
-def SBCAN(is_first_pass, dire):
+def SBCN(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
 	return "DE" + dire
-
-def RST18H(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "DF"
 
 def RETPO(is_first_pass):
 	if (is_first_pass):
@@ -1176,11 +1182,6 @@ def ANDN(is_first_pass, dire):
 		return 2
 	return "E6" + dire
 
-def RST20H(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "E7"
-
 def RETPE(is_first_pass):
 	if (is_first_pass):
 		return 1
@@ -1191,7 +1192,7 @@ def JPHL(is_first_pass):
 		return 1
 	return "E9"
 
-def JEPENN(is_first_pass, dire):
+def JPPENN(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
 	return "EA" + dire
@@ -1210,11 +1211,6 @@ def XORN(is_first_pass, dire):
 	if (is_first_pass):
 		return 2
 	return "EE" + dire
-
-def RST28H(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "EF"
 
 def RETP(is_first_pass):
 	if (is_first_pass):
@@ -1251,11 +1247,6 @@ def ORN(is_first_pass, dire):
 		return 2
 	return "F6" + dire
 
-def RST30H(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "F7"
-
 def RETM(is_first_pass):
 	if (is_first_pass):
 		return 1
@@ -1286,1267 +1277,617 @@ def CPN(is_first_pass, dire):
 		return 2
 	return "FE" + dire
 
-def RST38H(is_first_pass):
-	if (is_first_pass):
-		return 1
-	return "FF"
-
 def RLCB(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB00"
 
 def RLCC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB01"
 
 def RLCD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB02"
 
 def RLCE(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB03"
 
 def RLCH(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB04"
 
 def RLCL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB05"
 
 def RLCHL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB06"
 
-def RLCA(is_first_pass):
+def RLC_A(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB07"
 
-def RRCB(is_first_pass):
+def RRC_B(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB08"
 
-def RRCC(is_first_pass):
+def RRC_C(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB09"
 
-def RRCD(is_first_pass):
+def RRC_D(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB0A"
 
-def RRCE(is_first_pass):
+def RRC_E(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB0B"
 
-def RRCH(is_first_pass):
+def RRC_H(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB0C"
 
-def RRCL(is_first_pass):
+def RRC_L(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB0D"
 
-def RRCHL(is_first_pass):
+def RRC_HL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB0E"
 
-def RRCA(is_first_pass):
+def RRC_A(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB0F"
 
-def RLB(is_first_pass):
+def RL_B(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB10"
 
-def RLC(is_first_pass):
+def RL_C(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB11"
 
-def RLD(is_first_pass):
+def RL_D(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB12"
 
-def RLE(is_first_pass):
+def RL_E(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB13"
 
-def RLH(is_first_pass):
+def RL_H(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB14"
 
-def RLL(is_first_pass):
+def RL_L(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB15"
 
-def RLHL(is_first_pass):
+def RL_HL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB16"
 
-def RLA(is_first_pass):
+def RL_A(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB17"
 
-def RRB(is_first_pass):
+def RR_B(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB18"
 
-def RRC(is_first_pass):
+def RR_C(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB19"
 
-def RRD(is_first_pass):
+def RR_D(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB1A"
 
-def RRE(is_first_pass):
+def RR_E(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB1B"
 
-def RRH(is_first_pass):
+def RR_H(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB1C"
 
-def RRL(is_first_pass):
+def RR_L(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB1D"
 
-def RRHL(is_first_pass):
+def RR_HL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB1E"
 
 def RRA(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB1F"
 
 def SLAB(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB20"
 
 def SLAC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB21"
 
 def SLAD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB22"
 
 def SLAE(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB23"
 
 def SLAH(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB24"
 
 def SLAL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB25"
 
 def SLAHL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB26"
 
 def SLAA(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB27"
 
 def SRAB(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB28"
 
 def SRAC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB29"
 
 def SRAD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB2A"
 
 def SRAE(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB2B"
 
 def SRAH(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB2C"
 
 def SRAL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB2D"
 
 def SRAHL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB2E"
 
 def SRAA(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB2F"
 
 def SRLB(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB38"
 
 def SRLC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB39"
 
 def SRLD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB3A"
 
 def SRLE(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB3B"
 
 def SRLH(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB3C"
 
 def SRLL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB3D"
 
 def SRLHL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
+	return "CB3E"
 
 def SRLA(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "CB"
-
-def BIT0B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT0A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT1A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT2A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT3A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT4A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT5A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT6A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def BIT7A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES0A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES1A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES2A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES3A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES4A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES5A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES6A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def RES7A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET0A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET1A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET2A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET3A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET4A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET5A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET6A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7B(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7C(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7D(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7E(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7H(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7L(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7HL(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def SET7A(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "CB"
-
-def ADDIXBC(is_first_pass, dire):
-	if (is_first_pass):
-		return 2
-	return "DD09" + dire
-
-def ADDIXDE(is_first_pass, dire):
-	if (is_first_pass):
-		return 2
-	return "DD19" + dire
+	return "CB3F"
+
+#N = 1 2 3 4 5 6 7
+def BITNB(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "000"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+
+	return "CB" + dire
+
+def BITNC(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "001"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def BITND(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "010"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def BITNE(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "011"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def BITNH(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "100"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def BITNL(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "101"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def BITNHL(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "110"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def BITNA(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "01" + b[dire] + "111"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+#N = 1 2 3 4 5 6 7
+def RESNB(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "000"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESNC(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "001"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESND(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "010"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESNE(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "011"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESNH(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "100"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESNL(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "101"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESNHL(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "110"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def RESNA(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "10" + b[dire] + "111"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+# N = 1 2 3 4 5 6 7
+def SETNB(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "000"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETNC(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "001"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETND(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "010"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETNE(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "011"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETNH(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "100"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETNL(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "101"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETNHL(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "110"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def SETNA(is_first_pass,dire):
+	if (is_first_pass):
+		return 2
+	else:
+		dire = dire[1:]
+		if dire in b.keys():
+			dire = "11" + b[dire] + "111"
+			dire = hex(int(dire,2))[2:].upper()
+		else:
+			return None
+			
+	return "CB" + dire
+
+def ADDIXBC(is_first_pass):
+	if (is_first_pass):
+		return 2
+	return "DD09"
+
+def ADDIXDE(is_first_pass):
+	if (is_first_pass):
+		return 2
+	return "DD19"
 
 def LDIXNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
 	return "DD21" + dire
 
-def LDNNIX(is_first_pass, dire):
+def LD_NN_IX(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
 	return "DD22" + dire
@@ -2556,80 +1897,80 @@ def INCIX(is_first_pass):
 		return 2
 	return "DD23"
 
-def ADDIXIX(is_first_pass, dire):
+def ADDIXIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD24" + dire
+	return "DD29"
 
-def LDIX_NN(is_first_pass, dire):
+def LDIX_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD25" + dire
+	return "DD2A" + dire
 
-def DECIX(is_first_pass, dire):
+def DECIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD2B"
 
 def INCIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD34" + dire
 
 def DECIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD35" + dire
 
 def LDIXdN(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DD36" + dire
 
-def ADDIXSP(is_first_pass, dire):
+def ADDIXSP(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DD39"
 
 def LDBIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD46" + dire
 
 def LDCIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD4E" + dire
 
 def LDDIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD56" + dire
 
 def LDEIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD5E" + dire
 
 def LDHIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD66" + dire
 
 def LDLIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD6E" + dire
 
 def LDIXdB(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD70" + dire
 
 def LDIXdC(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD71" + dire
 
 def LDIXdD(is_first_pass, dire):
 	if (is_first_pass):
@@ -2654,832 +1995,667 @@ def LDIXdL(is_first_pass, dire):
 def LDIXdA(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD76" + dire
+	return "DD77" + dire
 
 def LDAIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
 	return "DD7E" + dire
 
-def ADDAIXd(is_first_pass, dire):
+def ADDIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD86" + dire
 
-def ADCAIXd(is_first_pass, dire):
+def ADCIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD8E" + dire
 
 def SUBIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD96" + dire
 
-def SBCAIXd(is_first_pass, dire):
+def SBCIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DD9E" + dire
 
 def ANDIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DDA6" + dire
 
 def XORIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DDAE" + dire
 
 def ORIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DDB6" + dire
 
 def CPIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "DD" + dire
+	return "DDBE" + dire
 
-def POPIX(is_first_pass, dire):
+def POPIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DDE1"
 
-def EXSPIX(is_first_pass, dire):
+def EXSPIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DDE3"
 
 def PUSHIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD"
+	return "DDE5"
 
-def JPIX(is_first_pass, dire):
+def JPIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DDE9"
 
-def LDSPIX(is_first_pass, dire):
+def LDSPIX(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "DD" + dire
+	return "DDF9"
 
 def RLCIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "06"
 
 def RRCIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "0E"
 
 def RLIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "16"
 
 def RRIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "1E"
 
 def SLAIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "26"
 
 def SRAIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "2E"
 
 def SRLIXd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	return "DDCB" + dire + "3E"
 
-def BIT0IXd(is_first_pass, dire):
+##
+def BITNIXd(is_first_pass,num,dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	else:
+		if num in b.keys():
+			num = "01" + b[num] + "110"
+			num = hex(int(num,2))[2:].upper()
+		else:
+			return None
+			
+	return "DDCB" + dire + num
 
-def BIT1IXd(is_first_pass, dire):
+def RESNIXd(is_first_pass,num,dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
+	else:
+		if num in b.keys():
+			num = "10" + b[num] + "110"
+			num = hex(int(num,2))[2:].upper()
+		else:
+			return None
+			
+	return "DDCB" + dire + num
 
-def BIT2IXd(is_first_pass, dire):
+def SETNIXd(is_first_pass,num,dire):
 	if (is_first_pass):
 		return 4
-	return "DD" + dire
-
-def BIT3IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def BIT4IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def BIT5IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def BIT6IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def BIT7IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES0IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES1IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES2IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES3IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES4IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES5IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES6IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def RES7IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET0IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET1IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET2IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET3IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET4IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET5IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET6IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
-
-def SET7IXd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "DD" + dire
+	else:
+		if num in b.keys():
+			num = "11" + b[num] + "110"
+			num = hex(int(num,2))[2:].upper()
+		else:
+			return None
+			
+	return "DDCB" + dire + num
 
 def INBC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED40"
 
 def OUTCB(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED41"
 
 def SBCHLBC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED42"
 
-def LSNNBC(is_first_pass):
+def LS_NN_BC(is_first_pass,dire):
 	if (is_first_pass):
 		return 4
-	return "ED"
+	return "ED43"+dire
 
 def NEG(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED44"
 
-def RETN(is_first_pass, dire):
+def RETN(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED" + dire
+	return "ED45"
 
-def IM0(is_first_pass):
+def IMN(is_first_pass,dire):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	else:
+		if dire == "01":
+			dire = "ED56"
+		elif dire == "00":
+			dire = "ED46"
+		elif dire == "02":
+			dire = "ED5E"
+	return dire
 
 def LDIA(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED47"
 
-def INCCC(is_first_pass):
+def INC_C_(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED48"
 
 def OUTCC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED49"
 
 def ADCHLBC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED4A"
 
-def LDBCNN(is_first_pass, dire):
+def LDBC_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "ED" + dire
+	return "ED4B" + dire
 
 def RETI(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED4D"
 
-def INCDC(is_first_pass):
+def INDC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED50"
 
 def OUTCD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED51"
 
 def SBCHLDE(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED52"
 
-def LDDENN(is_first_pass, dire):
+def LDDE_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "ED" + dire
-
-def IM2(is_first_pass):
-	if (is_first_pass):
-		return 2
-	return "ED"
+	return "ED53" + dire
 
 def INHC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED60"
 
 def OUTCH(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED61"
 
 def SBCHLHL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED62"
 
 def RRD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED67"
 
 def INLC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED68"
 
 def OUTCL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED69"
 
 def ADCHLHL(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED6A"
 
 def RLD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED6F"
 
 def SBCHLSP(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED72"
 
-def LDNNSP(is_first_pass,dire):
+def LD_NN_SP(is_first_pass,dire):
 	if (is_first_pass):
 		return 4
-	return "ED"+dire
+	return "ED73"+dire
 
 def INAC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED78"
 
 def OUTCA(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED79"
 
 def ADCHLSP(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED7A"
 
-def LDSPNN(is_first_pass, dire):
+def LDSP_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "ED" + dire
+	return "ED7B" + dire
 
 def LDI(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDA0"
 
 def CPI(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDA1"
 
 def INI(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDA2"
 
 def OUTI(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDA3"
 
 def LDD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDA8"
 
-def CPD(is_first_pass):
+def CP_D(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDA9"
 
 def IND(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDAA"
 
 def OUTD(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDAB"
 
 def LDIR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDB0"
 
 def CPIR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDB1"
 
 def INIR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDB2"
 
 def OTIR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDB3"
 
 def LDDR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDB8"
 
-def PCDR(is_first_pass):
+def CPDR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "ED89"
 
 def INDR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDBA"
 
 def OTDR(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "ED"
+	return "EDBB"
 
-def ADDIYBC(is_first_pass, dire):
+def ADDIYBC(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FD09"
 
-def ADDIYDE(is_first_pass, dire):
+def ADDIYDE(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FD19"
 
 def LDIYNN(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FD21" + dire
 
-def LDNNIY(is_first_pass, dire):
+def LD_NN_IY(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FD22" + dire
 
 def INCIY(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "FD23"
 
-def ADDIYIY(is_first_pass, dire):
+def ADDIYIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FD29"
 
-def LDIYNN(is_first_pass, dire):
+def LDIY_NN_(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FD2A" + dire
 
-def DECIY(is_first_pass, dire):
+def DECIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FD2B"
 
 def INCIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD34" + dire
 
 def DECIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD35" + dire
 
 def LDIYdN(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FD36" + dire
 
-def ADDIYSP(is_first_pass, dire):
+def ADDIYSP(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FD39"
 
 def LDBIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD46" + dire
 
 def LDCIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD4E" + dire
 
 def LDDIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD56" + dire
 
 def LDEIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD5E" + dire
 
 def LDHIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD66" + dire
 
 def LDLIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD6E" + dire
 
 def LDIYdB(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FF" + dire
+	return "FD70" + dire
 
 def LDIYdC(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FF" + dire
+	return "FD71" + dire
 
 def LDIYdD(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FF" + dire
+	return "FD72" + dire
 
 def LDIYdE(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD73" + dire
 
 def LDIYdH(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD74" + dire
 
 def LDIYdL(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD75" + dire
 
 def LDIYdA(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD77" + dire
 
 def LDAIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD7E" + dire
 
-def ADDAIYd(is_first_pass, dire):
+def ADDIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD86" + dire
 
-def ADCAIYd(is_first_pass, dire):
+def ADCIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD8E" + dire
 
 def SUBIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD96" + dire
 
-def SBCAIYd(is_first_pass, dire):
+def SBCIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FD9E" + dire
 
 def ANDIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FDA6" + dire
 
 def XORIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FDAE" + dire
 
 def ORIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
-	return "FD" + dire
+	return "FDB6" + dire
 
 def CPIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 3
 	return "FDBE" + dire
 
-def POPIY(is_first_pass, dire):
+def POPIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FDE1"
 
-def EXSPIY(is_first_pass, dire):
+def EXSPIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FDE3"
 
 def PUSHIY(is_first_pass):
 	if (is_first_pass):
 		return 2
 	return "FDE5"
 
-def JPIY(is_first_pass, dire):
+def JPIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FDE5"
 
-def LDSPIY(is_first_pass, dire):
+def LDSPIY(is_first_pass):
 	if (is_first_pass):
 		return 2
-	return "FD" + dire
+	return "FDF9"
 
 def RLCIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCB" + dire + "06"
 
 def RRCIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCB" + dire + "0E"
 
 def RLIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCB" + dire + "16"
 
 def RRIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCD" + dire + "1E"
 
 def SLAIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCB" + dire + "26"
 
 def SRAIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCB" + dire +"2E"
 
 def SRLIYd(is_first_pass, dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	return "FDCB" + dire + "3E"
 
-def BIT0IYd(is_first_pass, dire):
+##
+def BITNIYd(is_first_pass,num,dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	else:
+		if num in b.keys():
+			num = "01" + b[num] + "110"
+			num = hex(int(num,2))[2:].upper()
+		else:
+			return None
+			
+	return "FDCB" + dire + num
 
-def BIT1IYd(is_first_pass, dire):
+def RESNIYd(is_first_pass,num,dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	else:
+		if num in b.keys():
+			num = "10" + b[num] + "110"
+			num = hex(int(num,2))[2:].upper()
+		else:
+			return None
+			
+	return "FDCB" + dire + num
 
-def BIT2IYd(is_first_pass, dire):
+def SETNIYd(is_first_pass,num,dire):
 	if (is_first_pass):
 		return 4
-	return "FD" + dire
+	else:
+		if num in b.keys():
+			num = "11" + b[num] + "110"
+			num = hex(int(num,2))[2:].upper()
+		else:
+			return None
+			
+	return "FDCB" + dire + num
 
-def BIT3IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def BIT4IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def BIT5IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def BIT6IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def BIT7IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES0IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES1IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES2IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES3IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES4IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES5IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES6IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def RES7IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET0IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET1IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET2IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET3IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET4IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET5IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET6IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-def SET7IYd(is_first_pass, dire):
-	if (is_first_pass):
-		return 4
-	return "FD" + dire
-
-
-#MappnngOpcodes
+#MappNgOpcodes
 map_mnem = {
 	"DB N":DB,
-	"END":END,
+	"END NN":END,
 	"EQU N":EQU,
 	"DL N":DL,
 	"NOP":NOP,
-	"LD BC, NN":LDBCNN,
+	"LD BC, NN": LDBCNN,
 	"LD (BC), A":LDBCA,
 	"INC BC":INCBC,
 	"INC B":INCB,
@@ -3494,7 +2670,7 @@ map_mnem = {
 	"DEC C":DECC,
 	"LD C, N":LDCN,
 	"RRCA":RRCA,
-	"DJNZ e":DJNZe,
+	"DJNZ NN":DJNZNN,
 	"LD DE, NN":LDDENN,
 	"LD (DE), A":LDDEA,
 	"INC DE":INCDE,
@@ -3502,7 +2678,7 @@ map_mnem = {
 	"DEC D":DECD,
 	"LD D, N":LDDN,
 	"RLA":RLA,
-	"JR e":JRe,
+	"JR NN":JRNN,
 	"ADD HL, DE":ADDHLDE,
 	"LD A, (DE)":LDADE,
 	"DEC DE":DECDE,
@@ -3510,34 +2686,35 @@ map_mnem = {
 	"DEC E":DECE,
 	"LD E, N":LDEN,
 	"RRA":RRA,
-	"JR NZ, e":JRNZe,
+	"JR NZ, NN":JRNZNN,
 	"LD HL, NN":LDHLNN,
-	"LD(NN), HL":LDNNHL,
+	"LD (NN), HL":LD_NN_HL,
 	"INC HL":INCHL,
 	"INC H":INCH,
 	"DEC H":DECH,
 	"LD H, N":LDHN,
 	"DAA":DAA,
-	"JR Z, e":JRZe,
+	"JR Z, NN":JRZNN,
 	"ADD HL, HL":ADDHLHL,
-	"LD (HL), (NN)":LDHLNN,
+	"LD HL, (NN)":LDHL_NN_,
 	"DEC HL":DECHL,
 	"INC L":INCL,
 	"DEC L":DECL,
 	"LD L, N":LDLN,
 	"CPL":CPL,
-	"JR NC, e":JRNCe,
+	"JR NC, NN":JRNCNN,
 	"LD SP, NN":LDSPNN,
-	"LD (NN), A":LDNNA,
+	"LD (NN), A":LD_NN_A,
 	"INC SP":INCSP,
-	"INC (HL)":INCHL,
-	"DEC (HL)":DECHL,
+	"INC (HL)":INC_HL_,
+	"DEC (HL)":DEC_HL_,
 	"LD (HL), N":LDHLN,
 	"SCF":SCF,
-	"JR C, e":JRCe,
+	"JR C, NN": JRCNN,
 	"ADD HL, SP":ADDHLSP,
-	"LD A, N":LDAN,
-	"LD A, (NN)":LDANN,
+	"LD A, N": LDAN,
+	"LD A, NN": LDAN,
+	"LD A, (NN)":LDA_NN_,
 	"DEC SP":DECSP,
 	"INC A":INCA,
 	"DEC A":DECA,
@@ -3546,9 +2723,9 @@ map_mnem = {
 	"LD B, C":LDBC,
 	"LD B, D":LDBD,
 	"LD B, E":LDBE,
-	"LD B, H, NN":LDBHNN,
+	"LD B, H":LDBH,
 	"LD B, L":LDBL,
-	"LD B, (HL)":LDBHL,
+	"LD B, (HL)":LDB_HL_,
 	"LD B, A":LDBA,
 	"LD C, B":LDCB,
 	"LD C, C":LDCC,
@@ -3606,22 +2783,22 @@ map_mnem = {
 	"LD A, L":LDAL,
 	"LD A, (HL)":LDAHL,
 	"LD A, A":LDAA,
-	"ADD B":ADDAB,
-	"ADD C":ADDAC,
-	"ADD D":ADDAD,
-	"ADD E":ADDAE,
-	"ADD H":ADDAH,
-	"ADD L":ADDAL,
-	"ADD (HL)":ADDAHL,
-	"ADD A":ADDAA,
-	"ADC B":ADCAB,
-	"ADC C":ADCAC,
-	"ADC D":ADCAD,
-	"ADC E":ADCAE,
-	"ADC H":ADCAH,
-	"ADC L":ADCAL,
-	"ADC (HL)":ADCAHL,
-	"ADC A":ADCAA,
+	"ADD B":ADDB,
+	"ADD C":ADDC,
+	"ADD D":ADDD,
+	"ADD E":ADDE,
+	"ADD H":ADDH,
+	"ADD L":ADDL,
+	"ADD (HL)":ADDHL,
+	"ADD A":ADDA,
+	"ADC B":ADCB,
+	"ADC C":ADCC,
+	"ADC D":ADCD,
+	"ADC E":ADCE,
+	"ADC H":ADCH,
+	"ADC L":ADCL,
+	"ADC (HL)":ADCHL,
+	"ADC A":ADCA,
 	"SUB B":SUBB,
 	"SUB C":SUBC,
 	"SUB D":SUBD,
@@ -3630,14 +2807,14 @@ map_mnem = {
 	"SUB L":SUBL,
 	"SUB (HL)":SUBHL,
 	"SUB A":SUBA,
-	"SBC B":SBCAB,
-	"SBC C":SBCAC,
-	"SBC D":SBCAD,
-	"SBC E":SBCAE,
-	"SBC H":SBCAH,
-	"SBC L":SBCAL,
-	"SBC (HL)":SBCAHL,
-	"SBC A":SBCAA,
+	"SBC B":SBCB,
+	"SBC C":SBCC,
+	"SBC D":SBCD,
+	"SBC E":SBCE,
+	"SBC H":SBCH,
+	"SBC L":SBCL,
+	"SBC (HL)":SBCHL,
+	"SBC A":SBCA,
 	"AND B":ANDB,
 	"AND C":ANDC,
 	"AND D":ANDD,
@@ -3667,7 +2844,7 @@ map_mnem = {
 	"CP D":CPD,
 	"CP E":CPE,
 	"CP H":CPH,
-	"CP L":CPL,
+	"CP L":CP_L,
 	"CP (HL)":CPHL,
 	"CP A":CPA,
 	"RET NZ":RETNZ,
@@ -3676,30 +2853,27 @@ map_mnem = {
 	"JP NN":JPNN,
 	"CALL NZ, NN":CALLNZNN,
 	"PUSH BC":PUSHBC,
-	"ADD A, N":ADDAN,
-	"RST 0":RST0,
+	"ADD N":ADDN,
+	"RST NN":RSTNN,
 	"RET Z":RETZ,
 	"RET":RET,
 	"JP Z, NN":JPZNN,
 	"CALL Z, NN":CALLZNN,
 	"CALL NN":CALLNN,
-	"ADC N":ADCAN,
-	"RST 8":RST8,
+	"ADC N":ADCN,
 	"RET NC":RETNC,
 	"POP DE":POPDE,
 	"JP NC, NN":JPNCNN,
-	"OUT (N), A":OUTNA,
+	"OUT (NN), A":OUTNA,
 	"CALL NC, NN":CALLNCNN,
 	"PUSH DE":PUSHDE,
-	"SUB N":SUBN,
-	"RST 10H":RST10H,
+	"SUB NN":SUBN,
 	"RET C":RETC,
 	"EXX":EXX,
 	"JP C, NN":JPCNN,
-	"IN A, (N)":INAN,
-	"CALL C, N":CALLCN,
-	"SBC N":SBCAN,
-	"RST 18H":RST18H,
+	"IN A, (NN)":INA_NN_,
+	"CALL C, NN":CALLCNN,
+	"SBC N":SBCN,
 	"RET PO":RETPO,
 	"POP HL":POPHL,
 	"JP PO, NN":JPPONN,
@@ -3707,29 +2881,26 @@ map_mnem = {
 	"CALL PO, NN":CALLPONN,
 	"PUSH HL":PUSHHL,
 	"AND N":ANDN,
-	"RST 20 H":RST20H,
 	"RET PE":RETPE,
 	"JP (HL)":JPHL,
-	"JE PE, NN":JEPENN,
+	"JP PE, NN":JPPENN,
 	"EX DE, HL":EXDEHL,
 	"CALL PE, NN":CALLPENN,
 	"XOR N":XORN,
-	"RST 28H":RST28H,
 	"RET P":RETP,
 	"POP AF":POPAF,
 	"JP P, NN":JPPNN,
 	"DI":DI,
 	"CALL P, NN":CALLPNN,
 	"PUSH AF":PUSHAF,
-	"OR N":ORN,
-	"RST 30H":RST30H,
+	"OR NN":ORN,
 	"RET M":RETM,
 	"LD SP, HL":LDSPHL,
 	"JP M, NN":JPMNN,
 	"EI":EI,
 	"CALL M, NN":CALLMNN,
-	"CP N":CPN,
-	"RST 38H":RST38H,
+	"CP N": CPN,
+	"CP NN":CPN,
 	"RLC B":RLCB,
 	"RLC C":RLCC,
 	"RLC D":RLCD,
@@ -3737,30 +2908,30 @@ map_mnem = {
 	"RLC H":RLCH,
 	"RLC L":RLCL,
 	"RLC (HL)":RLCHL,
-	"RLC A":RLCA,
-	"RRC B":RRCB,
-	"RRC C":RRCC,
-	"RRC D":RRCD,
-	"RRC E":RRCE,
-	"RRC H":RRCH,
-	"RRC L":RRCL,
-	"RRC (HL)":RRCHL,
-	"RRC A":RRCA,
-	"RL B":RLB,
-	"RL C":RLC,
-	"RL D":RLD,
-	"RL E":RLE,
-	"RL H":RLH,
-	"RL L":RLL,
-	"RL (HL)":RLHL,
-	"RL A":RLA,
-	"RR B":RRB,
-	"RR C":RRC,
-	"RR D":RRD,
-	"RR E":RRE,
-	"RR H":RRH,
-	"RR L":RRL,
-	"RR (HL)":RRHL,
+	"RLC A":RLC_A,
+	"RRC B":RRC_B,
+	"RRC C":RRC_C,
+	"RRC D":RRC_D,
+	"RRC E":RRC_E,
+	"RRC H":RRC_H,
+	"RRC L":RRC_L,
+	"RRC (HL)":RRC_HL,
+	"RRC A":RRC_A,
+	"RL B":RL_B,
+	"RL C":RL_C,
+	"RL D":RL_D,
+	"RL E":RL_E,
+	"RL H":RL_H,
+	"RL L":RL_L,
+	"RL (HL)":RL_HL,
+	"RL A":RL_A,
+	"RR B":RR_B,
+	"RR C":RR_C,
+	"RR D":RR_D,
+	"RR E":RR_E,
+	"RR H":RR_H,
+	"RR L":RR_L,
+	"RR (HL)":RR_HL,
 	"RR A":RRA,
 	"SLA B":SLAB,
 	"SLA C":SLAC,
@@ -3786,205 +2957,37 @@ map_mnem = {
 	"SRL L":SRLL,
 	"SRL (HL)":SRLHL,
 	"SRL A":SRLA,
-	"BIT 0, B":BIT0B,
-	"BIT 0, C":BIT0C,
-	"BIT 0, D":BIT0D,
-	"BIT 0, E":BIT0E,
-	"BIT 0, H":BIT0H,
-	"BIT 0, L":BIT0L,
-	"BIT 0, (HL)":BIT0HL,
-	"BIT 0, A":BIT0A,
-	"BIT 1, B":BIT1B,
-	"BIT 1, C":BIT1C,
-	"BIT 1, D":BIT1D,
-	"BIT 1, E":BIT1E,
-	"BIT 1, H":BIT1H,
-	"BIT 1, L":BIT1L,
-	"BIT 1, (HL)":BIT1HL,
-	"BIT 1, A":BIT1A,
-	"BIT 2, B":BIT2B,
-	"BIT 2, C":BIT2C,
-	"BIT 2, D":BIT2D,
-	"BIT 2, E":BIT2E,
-	"BIT 2, H":BIT2H,
-	"BIT 2, L":BIT2L,
-	"BIT 2, (HL)":BIT2HL,
-	"BIT 2, A":BIT2A,
-	"BIT 3, B":BIT3B,
-	"BIT 3, C":BIT3C,
-	"BIT 3, D":BIT3D,
-	"BIT 3, E  ":BIT3E,
-	"BIT 3, H":BIT3H,
-	"BIT 3, L":BIT3L,
-	"BIT 3, (HL)":BIT3HL,
-	"BIT 3, A":BIT3A,
-	"BIT 4, B":BIT4B,
-	"BIT 4, C":BIT4C,
-	"BIT 4, D":BIT4D,
-	"BIT 4, E":BIT4E,
-	"BIT 4, H":BIT4H,
-	"BIT 4, L":BIT4L,
-	"BIT 4, (HL)":BIT4HL,
-	"BIT 4, A":BIT4A,
-	"BIT 5, B":BIT5B,
-	"BIT 5, C":BIT5C,
-	"BIT 5, D":BIT5D,
-	"BIT 5, E":BIT5E,
-	"BIT 5, H":BIT5H,
-	"BIT 5, L":BIT5L,
-	"BIT 5, (HL)":BIT5HL,
-	"BIT 5, A":BIT5A,
-	"BIT 6, B":BIT6B,
-	"BIT 6, C":BIT6C,
-	"BIT 6, D":BIT6D,
-	"BIT 6, E":BIT6E,
-	"BIT 6, H":BIT6H,
-	"BIT 6, L":BIT6L,
-	"BIT 6, (HL)":BIT6HL,
-	"BIT 6, A":BIT6A,
-	"BIT 7, B":BIT7B,
-	"BIT 7, C":BIT7C,
-	"BIT 7, D":BIT7D,
-	"BIT 7, E":BIT7E,
-	"BIT 7, H":BIT7H,
-	"BIT 7, L":BIT7L,
-	"BIT 7, (HL)":BIT7HL,
-	"BIT 7, A":BIT7A,
-	"RES 0, B":RES0B,
-	"RES 0, C":RES0C,
-	"RES 0, D":RES0D,
-	"RES 0, E":RES0E,
-	"RES 0, H":RES0H,
-	"RES 0, L":RES0L,
-	"RES 0, (HL)":RES0HL,
-	"RES 0, A":RES0A,
-	"RES 1, B":RES1B,
-	"RES 1, C":RES1C,
-	"RES 1, D":RES1D,
-	"RES 1, E":RES1E,
-	"RES 1, H":RES1H,
-	"RES 1, L":RES1L,
-	"RES 1, (HL)":RES1HL,
-	"RES 1, A":RES1A,
-	"RES 2, B":RES2B,
-	"RES 2, C":RES2C,
-	"RES 2, D":RES2D,
-	"RES 2, E":RES2E,
-	"RES 2, H":RES2H,
-	"RES 2, L":RES2L,
-	"RES 2, (HL)":RES2HL,
-	"RES 2, A":RES2A,
-	"RES 3, B":RES3B,
-	"RES 3, C":RES3C,
-	"RES 3, D":RES3D,
-	"RES 3, E":RES3E,
-	"RES 3, H":RES3H,
-	"RES 3, L":RES3L,
-	"RES 3, (HL)":RES3HL,
-	"RES 3, A":RES3A,
-	"RES 4, B":RES4B,
-	"RES 4, C":RES4C,
-	"RES 4, D":RES4D,
-	"RES 4, E":RES4E,
-	"RES 4, H":RES4H,
-	"RES 4, L":RES4L,
-	"RES 4, (HL)":RES4HL,
-	"RES 4, A":RES4A,
-	"RES 5, B":RES5B,
-	"RES 5, C":RES5C,
-	"RES 5, D":RES5D,
-	"RES 5, E":RES5E,
-	"RES 5, H":RES5H,
-	"RES 5, L":RES5L,
-	"RES 5, (HL)":RES5HL,
-	"RES 5, A":RES5A,
-	"RES 6, B":RES6B,
-	"RES 6, C":RES6C,
-	"RES 6, D":RES6D,
-	"RES 6, E":RES6E,
-	"RES 6, H":RES6H,
-	"RES 6, L":RES6L,
-	"RES 6, (HL)":RES6HL,
-	"RES 6, A":RES6A,
-	"RES 7, B":RES7B,
-	"RES 7, C":RES7C,
-	"RES 7, D":RES7D,
-	"RES 7, E":RES7E,
-	"RES 7, H":RES7H,
-	"RES 7, L":RES7L,
-	"RES 7, (HL)":RES7HL,
-	"RES 7, A ":RES7A,
-	"SET 0, B":SET0B,
-	"SET 0, C":SET0C,
-	"SET 0, D":SET0D,
-	"SET 0, E":SET0E,
-	"SET 0, H":SET0H,
-	"SET 0, L":SET0L,
-	"SET 0, (HL)":SET0HL,
-	"SET 0, A":SET0A,
-	"SET 1, B":SET1B,
-	"SET 1, C":SET1C,
-	"SET 1, D":SET1D,
-	"SET 1, E":SET1E,
-	"SET 1, H":SET1H,
-	"SET 1, L":SET1L,
-	"SET 1, (HL)":SET1HL,
-	"SET 1, A":SET1A,
-	"SET 2, B":SET2B,
-	"SET 2, C":SET2C,
-	"SET 2, D":SET2D,
-	"SET 2, E":SET2E,
-	"SET 2, H":SET2H,
-	"SET 2, L ":SET2L,
-	"SET 2, (HL)":SET2HL,
-	"SET 2, A":SET2A,
-	"SET 3, B":SET3B,
-	"SET 3, C":SET3C,
-	"SET 3, D":SET3D,
-	"SET 3, E":SET3E,
-	"SET 3, H":SET3H,
-	"SET 3, L":SET3L,
-	"SET 3, (HL)":SET3HL,
-	"SET 3, A":SET3A,
-	"SET 4, B":SET4B,
-	"SET 4, C":SET4C,
-	"SET 4, D":SET4D,
-	"SET 4, E":SET4E,
-	"SET 4, H":SET4H,
-	"SET 4, L":SET4L,
-	"SET 4, (HL)":SET4HL,
-	"SET 4, A":SET4A,
-	"SET 5, B":SET5B,
-	"SET 5, C ":SET5C,
-	"SET 5, D":SET5D,
-	"SET 5, E":SET5E,
-	"SET 5, H":SET5H,
-	"SET 5, L":SET5L,
-	"SET 5, (HL)":SET5HL,
-	"SET 5, A":SET5A,
-	"SET 6, B":SET6B,
-	"SET 6, C":SET6C,
-	"SET 6, D":SET6D,
-	"SET 6, E":SET6E,
-	"SET 6, H":SET6H,
-	"SET 6, L":SET6L,
-	"SET 6, (HL)":SET6HL,
-	"SET 6, A":SET6A,
-	"SET 7, B":SET7B,
-	"SET 7, C":SET7C,
-	"SET 7, D":SET7D,
-	"SET 7, E":SET7E,
-	"SET 7, H":SET7H,
-	"SET 7, L":SET7L,
-	"SET 7, (HL)":SET7HL,
-	"SET 7, A":SET7A,
+	"BIT N, B":BITNB,
+	"BIT N, C":BITNC,
+	"BIT N, D":BITND,
+	"BIT N, E":BITNE,
+	"BIT N, H":BITNH,
+	"BIT N, L":BITNL,
+	"BIT N, (HL)":BITNHL,
+	"BIT N, A":BITNA,
+	"RES N, B":RESNB,
+	"RES N, C":RESNC,
+	"RES N, D":RESND,
+	"RES N, E":RESNE,
+	"RES N, H":RESNH,
+	"RES N, L":RESNL,
+	"RES N, (HL)":RESNHL,
+	"RES N, A":RESNA,
+	"SET N, B":SETNB,
+	"SET N, C":SETNC,
+	"SET N, D":SETND,
+	"SET N, E":SETNE,
+	"SET N, H":SETNH,
+	"SET N, L":SETNL,
+	"SET N, (HL)":SETNHL,
+	"SET N, A":SETNA,
 	"ADD IX, BC":ADDIXBC,
 	"ADD IX, DE":ADDIXDE,
 	"LD IX, NN":LDIXNN,
-	"LD (NN), IX":LDNNIX,
+	"LD (NN), IX":LD_NN_IX,
 	"INC IX":INCIX,
 	"ADD IX, IX":ADDIXIX,
-	"LD IX, (NN)":LDIX_NN,
+	"LD IX, (NN)":LDIX_NN_,
 	"DEC IX":DECIX,
 	"INC (IX + d)":INCIXd,
 	"DEC (IX + d)":DECIXd,
@@ -4004,10 +3007,10 @@ map_mnem = {
 	"LD (IX + d), L":LDIXdL,
 	"LD (IX + d), A":LDIXdA,
 	"LD A, (IX + d)":LDAIXd,
-	"ADD A, (IX + d)":ADDAIXd,
-	"ADC A, (IX + d)":ADCAIXd,
+	"ADD (IX + d)":ADDIXd,
+	"ADC (IX + d)":ADCIXd,
 	"SUB (IX + d)":SUBIXd,
-	"SBC A, (IX + d)":SBCAIXd,
+	"SBC (IX + d)":SBCIXd,
 	"AND (IX + d)":ANDIXd,
 	"XOR (IX + d)":XORIXd,
 	"OR (IX + d)":ORIXd,
@@ -4024,48 +3027,26 @@ map_mnem = {
 	"SLA (IX + d)":SLAIXd,
 	"SRA (IX + d)":SRAIXd,
 	"SRL (IX + d)":SRLIXd,
-	"BIT 0, (IX + d)":BIT0IXd,
-	"BIT 1, (IX + d)":BIT1IXd,
-	"BIT 2, (IX + d)":BIT2IXd,
-	"BIT 3, (IX + d)":BIT3IXd,
-	"BIT 4, (IX + d)":BIT4IXd,
-	"BIT 5, (IX + d)":BIT5IXd,
-	"BIT 6, (IX + d)":BIT6IXd,
-	"BIT 7, (IX + d)":BIT7IXd,
-	"RES 0, (IX + d)":RES0IXd,
-	"RES 1, (IX + d)":RES1IXd,
-	"RES 2, (IX + d)":RES2IXd,
-	"RES 3, (IX + d)":RES3IXd,
-	"RES 4, (IX + d)":RES4IXd,
-	"RES 5, (IX + d)":RES5IXd,
-	"RES 6, (IX + d)":RES6IXd,
-	"RES 7, (IX + d)":RES7IXd,
-	"SET 0, (IX + d)":SET0IXd,
-	"SET 1, (IX + d)":SET1IXd,
-	"SET 2, (IX + d)":SET2IXd,
-	"SET 3, (IX + d)":SET3IXd,
-	"SET 4, (IX + d)":SET4IXd,
-	"SET 5, (IX + d)":SET5IXd,
-	"SET 6, (IX + d)":SET6IXd,
-	"SET 7, (IX + d)":SET7IXd,
+	"BIT N, (IX + d)":BITNIXd,
+	"RES N, (IX + d)":RESNIXd,
+	"SET N, (IX + d)":SETNIXd,
 	"IN B, (C)":INBC,
 	"OUT (C), B":OUTCB,
 	"SBC HL, BC":SBCHLBC,
-	"LS (NN), BC":LSNNBC,
+	"LS (NN), BC":LS_NN_BC,
 	"NEG":NEG,
 	"RETN":RETN,
-	"IM 0":IM0,
+	"IM N":IMN,
 	"LD I, A":LDIA,
-	"INC C, (C)":INCCC,
+	"IN C, (C)":INC_C_,
 	"OUT (C), C":OUTCC,
 	"ADC HL, BC":ADCHLBC,
-	"LD BC, (NN)":LDBCNN,
+	"LD BC, (NN)":LDBC_NN_,
 	"RETI":RETI,
-	"INC D, (C)":INCDC,
+	"IN D, (C)":INDC,
 	"OUT (C), D":OUTCD,
 	"SBC HL, DE":SBCHLDE,
-	"LD DE, (NN)":LDDENN,
-	"IM 2":IM2,
+	"LD DE, (NN)":LDDE_NN_,
 	"IN H, (C)":INHC,
 	"OUT (C), H":OUTCH,
 	"SBC HL, HL":SBCHLHL,
@@ -4075,17 +3056,17 @@ map_mnem = {
 	"ADC HL, HL":ADCHLHL,
 	"RLD":RLD,
 	"SBC HL, SP":SBCHLSP,
-	"LD (NN), SP":LDNNSP,
+	"LD (NN), SP":LD_NN_SP,
 	"IN A, (C)":INAC,
 	"OUT (C), A":OUTCA,
 	"ADC HL, SP":ADCHLSP,
-	"LD SP, (NN)":LDSPNN,
+	"LD SP, (NN)":LDSP_NN_,
 	"LDI":LDI,
 	"CPI":CPI,
 	"INI":INI,
 	"OUTI":OUTI,
 	"LDD":LDD,
-	"CPD":CPD,
+	"CPD":CP_D,
 	"IND":IND,
 	"OUTD":OUTD,
 	"LDIR":LDIR,
@@ -4093,16 +3074,16 @@ map_mnem = {
 	"INIR":INIR,
 	"OTIR":OTIR,
 	"LDDR":LDDR,
-	"PCDR":PCDR,
+	"CPDR":CPDR,
 	"INDR":INDR,
 	"OTDR":OTDR,
 	"ADD IY, BC":ADDIYBC,
 	"ADD IY, DE":ADDIYDE,
 	"LD IY, NN":LDIYNN,
-	"LD (NN), IY":LDNNIY,
+	"LD (NN), IY":LD_NN_IY,
 	"INC IY":INCIY,
 	"ADD IY, IY":ADDIYIY,
-	"LD IY, (NN)":LDIYNN,
+	"LD IY, (NN)":LDIY_NN_,
 	"DEC IY":DECIY,
 	"INC (IY + d)":INCIYd,
 	"DEC (IY + d)":DECIYd,
@@ -4122,10 +3103,10 @@ map_mnem = {
 	"LD (IY + d), L":LDIYdL,
 	"LD (IY + d), A":LDIYdA,
 	"LD A, (IY + d)":LDAIYd,
-	"ADD A, (IY + d)":ADDAIYd,
-	"ADC A, (IY + d)":ADCAIYd,
+	"ADD (IY + d)":ADDIYd,
+	"ADC (IY + d)":ADCIYd,
 	"SUB (IY + d)":SUBIYd,
-	"SBC A, (IY + d)":SBCAIYd,
+	"SBC (IY + d)":SBCIYd,
 	"AND (IY + d)":ANDIYd,
 	"XOR (IY + d)":XORIYd,
 	"OR (IY + d)":ORIYd,
@@ -4142,29 +3123,8 @@ map_mnem = {
 	"SLA (IY + d)":SLAIYd,
 	"SRA (IY + d)":SRAIYd,
 	"SRL (IY + d)":SRLIYd,
-	"BIT 0, (IY + d)":BIT0IYd,
-	"BIT 1, (IY + d)":BIT1IYd,
-	"BIT 2, (IY + d)":BIT2IYd,
-	"BIT 3, (IY + d)":BIT3IYd,
-	"BIT 4, (IY + d)":BIT4IYd,
-	"BIT 5, (IY + d)":BIT5IYd,
-	"BIT 6, (IY + d)":BIT6IYd,
-	"BIT 7, (IY + d)":BIT7IYd,
-	"RES 0, (IY + d)":RES0IYd,
-	"RES 1, (IY + d)":RES1IYd,
-	"RES 2, (IY + d)":RES2IYd,
-	"RES 3, (IY + d)":RES3IYd,
-	"RES 4, (IY + d)":RES4IYd,
-	"RES 5, (IY + d)":RES5IYd,
-	"RES 6, (IY + d)":RES6IYd,
-	"RES 7, (IY + d)":RES7IYd,
-	"SET 0, (IY + d)":SET0IYd,
-	"SET 1, (IY + d)":SET1IYd,
-	"SET 2, (IY + d)":SET2IYd,
-	"SET 3, (IY + d)":SET3IYd,
-	"SET 4, (IY + d)":SET4IYd,
-	"SET 5, (IY + d)":SET5IYd,
-	"SET 6, (IY + d)":SET6IYd,
-	"SET 7, (IY + d)":SET7IYd,
+	"BIT N, (IY + d)":BITNIYd,
+	"RES N, (IY + d)":RESNIYd,
+	"SET N, (IY + d)":SETNIYd,
 }
 
