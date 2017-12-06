@@ -15,7 +15,6 @@ class Assembler(object):
 			terms 		(list)		: Lista de terminos de la instrucción
 			TS 			(HashTable) : Tabla de simbolos
 			CO 			(list)		: Codigo Objeto
-			valid_sintx (boolean)	: Variable booleana	para confirmar la sintaxis de la instrucción
 	"""
 
 	def __init__(self, fileName):
@@ -34,7 +33,6 @@ class Assembler(object):
 		self.list_cl = []
 		self.TS = {}
 		self.CO = []
-		self.valid_sintx = True
 		self.band = False
 
 	""" 
@@ -46,7 +44,8 @@ class Assembler(object):
 		for line in file:
 			line = line.replace("\n", "")
 			line = line.replace("\t", "")
-			self.fileLines.append(line)
+			if len(line) > 0:
+				self.fileLines.append(line)
 		file.close()
 
 	""" 
@@ -57,19 +56,18 @@ class Assembler(object):
 	"""
 	def first_pass(self):
 		num_line = 1
-		fileLines = filter(lambda a: a != "", self.fileLines)
 		for line in self.fileLines:
 			self.sintax_line(line,num_line)
 			self.partition_line(line,num_line)
 			self.set_table_symbols(num_line)
 			self.valid_instruction(num_line)
+			self.valid_operands(num_line)
 			self.band = False
 
 			if self.dir_in_e == "":
 				if self.instruction not in mne.v_directives:
 					aux =  hex(self.cl)[2:].upper()
-					aux = "0000"[len(aux):] + aux
-					self.dir_in_e = aux
+					self.dir_in_e = "0000"[len(aux):] + aux
 
 			if len(self.operands) == 2:
 				op1 = self.get_type_operand(self.operands[0])	
@@ -80,9 +78,7 @@ class Assembler(object):
 				op1 = self.get_type_operand(self.operands[0])
 				op2 = ""
 
-
 			ints = (self.instruction + " " + op1 + op2).strip()
-
 			size = mne.map_mnem.get(ints,None)
 
 			if size == None:
@@ -95,7 +91,6 @@ class Assembler(object):
 						size = size(True,self.operands[0],"0000")
 					else:
 						size = size(True,"0000")
-
 				else:
 					size = size(True)
 
@@ -116,7 +111,6 @@ class Assembler(object):
 	"""
 	def Second_pass(self):
 		num_line = 1
-		fileLines = filter(lambda a: a != "", self.fileLines)
 		for line in self.fileLines:
 			self.sintax_line(line,num_line)
 			self.partition_line(line,num_line)
@@ -146,7 +140,6 @@ class Assembler(object):
 					dire = self.get_dire(self.operands[0],op1,num_line)
 
 			ints = (self.instruction + " " + op1 + op2).strip()
-
 		
 			code = mne.map_mnem.get(ints,None)
 
@@ -166,7 +159,6 @@ class Assembler(object):
 			num_line +=1
 			self.CO.append(code)
 
-
 	"""
 		Optener la dirección o el valodr de la etiquetas y/o de las constantes definidas cuando la intrucción es JR
 	"""
@@ -178,7 +170,7 @@ class Assembler(object):
 		#Complemento a 2
 		if dire < 0:
 			num_line = 0
-			dire =bin(dire)[3:]
+			dire = bin(dire)[3:]
 			dire = "00000000"[len(dire):] + dire
 			dire1 = ""
 			for char in dire:
@@ -206,8 +198,13 @@ class Assembler(object):
 			elif op_1 == "(NN)":
 				if op[1:-1] in self.TS.keys():
 					dire = self.TS[op[1:-1]]
+
+				elif op[1:-1].isalnum():
+					dire = "00"[len(op):] + op[1:-2]
+
 				else:
-					dire = op[1:-2]
+					messag = "Error, la etiqueta de la linea " + str(num_line) + " nunca fue definida."
+					raise Exception(messag)
 
 			elif op_1 == "NN":
 				if op in self.TS.keys():
@@ -221,16 +218,7 @@ class Assembler(object):
 					raise Exception(messag)
 
 			elif op_1 == "N":
-				if op in self.TS.keys():
-					dire = self.TS[op]
-
-				elif op.isdigit():
-					dire = "00"[len(op):] + op
-
-				else:
-					messag = "Error, la etiqueta de la linea " + str(num_line) + " nunca fue definida."
-					raise Exception(messag)
-
+				dire = "00"[len(op):] + op
 
 		if len(dire)>3:
 			dire = dire[2:]+dire[:-2]
@@ -256,7 +244,7 @@ class Assembler(object):
 			elif op.isalnum():
 				op = "NN"
 			else:
-				op = "N"
+				op = ""
 		return op
 
 	"""
@@ -273,10 +261,10 @@ class Assembler(object):
 
 						if self.instruction == "EQU":
 							self.TS[self.label] = self.operands[0]
+
 						else:
 							aux = hex(self.cl).upper()[2:]
-							aux = "0000"[len(aux):]+aux
-							self.TS[self.label] = aux
+							self.TS[self.label] = "0000"[len(aux):]+aux
 
 					else:
 						messag = "Error, la etiqueta de la linea " + str(num_line) + " ya fue definida."
@@ -298,10 +286,24 @@ class Assembler(object):
 			raise Exception(messag)
 
 	"""
+		Validar sintaxis de los operandos.
+	"""
+	def valid_operands(self,num_line):
+		for operand in self.operands:
+			if operand not in mne.v_ops:
+				if "(" in operand and ")" not in operand:
+					messag = "Error, el operando "+ operand + " ,de la instrucción de la linea " + str(num_line)  + " le faltan parentesis."
+					raise Exception(messag)
+				elif "(" not in operand and ")" in operand:
+					messag = "Error, el operando "+ operand + " ,de la instrucción de la linea " + str(num_line)  + " le faltan parentesis."
+					raise Exception(messag)
+
+
+	"""
 		Obtener la etiqueta, la intruccion y los operandos de la linea recibida.
 	"""
 	def partition_line(self,line,num_line):
-		aux = ""
+
 		line = (line.split(";")[0]).split(":")
 
 		if len(line) == 2:
@@ -317,7 +319,7 @@ class Assembler(object):
 		num = line.find(" ")
 
 		if num == -1:
-			num = len(line) 
+			num = len(line)
 
 		self.instruction = line[:num]
 
@@ -342,30 +344,28 @@ class Assembler(object):
 			messag = "Error en la linea " + str(num_line) + ", existe más de un definición de etiqueta."
 			raise Exception(messag)
 
-
 	"""	
 		Imprime en un archivo con terminación .Tco  una tabla que contiene el codigo objeto y el 
 		contador de localidades que le correponde a cada instrucción.
 	"""
 	def print_tabla(self):
 		tabla = open(self.fileName[:-4] + ".Tco", "w+")
-		contador = 0
-		tabla.write("Linea\t\tCO\t\tCL\t\tIntrucción\n")
+		contador = 1
+		tabla.write("Tabla:\nLinea\t\t  CO\t\t CL\t\t   Intrucción\n")
 		for co in self.CO:
-			if len(co) == 4:
-				tabla.write(str(contador) + "\t\t" + co + "\t\t" + str(self.list_cl[contador]) + "\t\t" + str(self.fileLines[contador]) + "\n")
-			elif len(co) == 2:
-				tabla.write(str(contador) + "\t\t" + co + "\t\t" + str(self.list_cl[contador]) + "\t\t" + str(self.fileLines[contador]) + "\n")
-			elif len(co) == 6:
-				tabla.write(str(contador) + "\t\t" + co + "\t\t" + str(self.list_cl[contador]) + "\t\t" + str(self.fileLines[contador]) + "\n")
-			elif len(co) == 8:
-				tabla.write(str(contador) + "\t\t" + co + "\t" + str(self.list_cl[contador]) + "\t\t" + str(self.fileLines[contador]) + "\n")
+			if len(co) >= 8:
+				tabla.write(str(contador) + "\t\t" + co + "\t" + str(self.list_cl[contador-1]) + "\t\t" + str(self.fileLines[contador-1]) + "\n")
 			else:
-				tabla.write(str(contador) + "\t\t" + co +  "\t" + str(self.list_cl[contador]) + "\t\t" + str(self.fileLines[contador]) + "\n")
+				tabla.write(str(contador) + "\t\t" + co + "\t\t" + str(self.list_cl[contador-1]) + "\t\t" + str(self.fileLines[contador-1]) + "\n")
+			
 			contador += 1
+
+		tabla.write("\nTabla de Simbolos:\nNombre\t\tValor\n")
+		for valor in self.TS:
+			tabla.write(valor + "\t\t" +self.TS[valor]+"\n")
+
 		print("Tabla Creada")
 		tabla.close()
-
 
 	"""	
 		Imprime en un archivo con terminación .co el codigo objeto.
@@ -381,7 +381,7 @@ class Assembler(object):
 		codigo_objeto.close()
 
 
-aux = Assembler("6.txt")
+aux = Assembler("8.txt")
 aux.leerArchivo()
 aux.first_pass()
 aux.Second_pass()

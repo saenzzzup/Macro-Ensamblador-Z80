@@ -17,10 +17,9 @@ v_mnemonicos = ["LD","PUSH","POP","EX","EXX","LDI","LDIR","LDD","LDDR","CPI","CP
 #Valid directives
 v_directives = ["ORG","END","DB","DW","DL","EQU"]
 
+
 mne_aux = ["BIT","RES","SET"]
-
 p = {"00":"000","08": "001", "10": "010", "18": "011", "20":"100", "28":"101","30": "110", "38": "111"}
-
 b = {"0":"000","1": "001", "2": "010", "3": "011", "4":"100", "5":"101","6": "110", "7": "111"}
 
 
@@ -2648,7 +2647,7 @@ def SETNIYd(is_first_pass,num,dire):
 			
 	return "FDCB" + dire + num
 
-#MappNgOpcodes
+#MappOpcodes
 map_mnem = {
 	"DB N":DB,
 	"END NN":END,
@@ -3127,4 +3126,3 @@ map_mnem = {
 	"RES N, (IY + d)":RESNIYd,
 	"SET N, (IY + d)":SETNIYd,
 }
-
