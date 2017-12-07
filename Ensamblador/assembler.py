@@ -381,9 +381,10 @@ class Assembler(object):
 		codigo_objeto.close()
 
 
-aux = Assembler("8.txt")
-aux.leerArchivo()
+
+#aux = Assembler("8.txt")
+"""aux.leerArchivo()
 aux.first_pass()
 aux.Second_pass()
 aux.print_tabla()
-aux.print_co()
+aux.print_co()"""

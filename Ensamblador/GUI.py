@@ -4,7 +4,7 @@ import os, errno
 from tkinter import filedialog
 
 from macros import Macros
-from ensambler import Ensambler
+from assembler import Assembler
 
 class PopUP:
 	def __init__(self, master):
@@ -102,7 +102,7 @@ class MainApplication:
 
 		if not self.fileOpener(): return
 
-		ens = Ensambler(self.filename)
+		ens = assembler(self.filename)
 		ens.leerArchivo()
 
 
