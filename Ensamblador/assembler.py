@@ -69,6 +69,13 @@ class Assembler(object):
 					aux =  hex(self.cl)[2:].upper()
 					self.dir_in_e = "0000"[len(aux):] + aux
 
+			if self.instruction == "ORG":
+				if len(self.operands) == 1 and self.operands[0].isalnum():
+					self.dir_in_e = self.operands[0][:-1]
+				else:
+					messag = "Error, la directiva ORG de la linea " + str(num_line) + " requiere de una dirección."
+					raise Exception(messag)
+
 			if len(self.operands) == 2:
 				op1 = self.get_type_operand(self.operands[0])	
 				op2 = self.get_type_operand(self.operands[1])
@@ -256,6 +263,14 @@ class Assembler(object):
 			if self.label not in mne.v_ops:
 
 				if self.label not in mne.v_mnemonicos:
+
+					if self.instruction == "DL":
+
+						if self.operands[0].isdigit():
+							self.TS[self.label] = self.operands[0]
+
+						elif self.operands[0].isalnum():
+							self.TS[self.label] = self.operands[0][:-1]
 
 					if self.label not in self.TS:
 

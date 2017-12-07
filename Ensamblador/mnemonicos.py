@@ -15,13 +15,17 @@ v_mnemonicos = ["LD","PUSH","POP","EX","EXX","LDI","LDIR","LDD","LDDR","CPI","CP
 ]
 
 #Valid directives
-v_directives = ["ORG","END","DB","DW","DL","EQU"]
+v_directives = ["ORG","END","DB","DL","EQU"]
 
 
 mne_aux = ["BIT","RES","SET"]
 p = {"00":"000","08": "001", "10": "010", "18": "011", "20":"100", "28":"101","30": "110", "38": "111"}
 b = {"0":"000","1": "001", "2": "010", "3": "011", "4":"100", "5":"101","6": "110", "7": "111"}
 
+def ORG(is_first_pass,value):
+	if (is_first_pass):
+		return 1
+	return value
 
 def DB(is_first_pass,value):
 	if (is_first_pass):
@@ -2649,9 +2653,11 @@ def SETNIYd(is_first_pass,num,dire):
 
 #MappOpcodes
 map_mnem = {
+	"ORG NN":ORG,
 	"DB N":DB,
 	"END NN":END,
 	"EQU N":EQU,
+	"DL NN":DL,
 	"DL N":DL,
 	"NOP":NOP,
 	"LD BC, NN": LDBCNN,
