@@ -1,7 +1,7 @@
 missing module named resource - imported by posix, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
 missing module named posix - imported by os, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
 missing module named _posixsubprocess - imported by subprocess, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
-missing module named org - imported by pickle, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
+missing module named 'org.python' - imported by pickle, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py, xml.sax
 missing module named readline - imported by cmd, code, pdb, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
 excluded module named _frozen_importlib - imported by importlib, importlib.abc, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
 missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
@@ -13,5 +13,5 @@ missing module named vms_lib - imported by platform, E:\ProyectosPython\Macro-En
 missing module named termios - imported by tty, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py, getpass
 missing module named grp - imported by tarfile, shutil, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
 missing module named pwd - imported by posixpath, tarfile, shutil, http.server, webbrowser, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py, netrc, getpass
-missing module named 'org.python' - imported by copy, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py, xml.sax
 missing module named _dummy_threading - imported by dummy_threading, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
+missing module named org - imported by copy, E:\ProyectosPython\Macro-Ensamblador-Z80\Ensamblador\GUI.py
