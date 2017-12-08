@@ -102,20 +102,21 @@ class MainApplication:
 
 		if not self.fileOpener(): return
 
-		ens = assembler(self.filename)
+		ens = Assembler(self.filename)
 		ens.leerArchivo()
 
 
 		try:
 			ens.first_pass()
 			ens.Second_pass()
+			ens.print_tabla()
 		except Exception as ex: 
 			self.newWindow = tk.Toplevel(self.master)
 			self.pop = PopUP(self.newWindow)
 			self.pop.addMessage("Error", str(ex))
 			return
 
-		fileOut = open (self.directory + "out.co", "w+")
+		fileOut = open (self.directory + "out.obj", "w+")
 		for line in ens.CO:
 			fileOut.write(line + "\n")
 		fileOut.close()
@@ -123,7 +124,7 @@ class MainApplication:
 		self.newWindow = tk.Toplevel(self.master)
 		self.pop = PopUP(self.newWindow)
 		self.pop.addMessage("Información",
-			"Archivo .CO creado en: \n" +
+			"Archivo .obj creado en: \n" +
 			self.directory)
 
 	def macroEnsamblar(self):

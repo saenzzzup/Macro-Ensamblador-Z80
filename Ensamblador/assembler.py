@@ -364,7 +364,7 @@ class Assembler(object):
 		contador de localidades que le correponde a cada instrucción.
 	"""
 	def print_tabla(self):
-		tabla = open(self.fileName[:-4] + ".Tco", "w+")
+		tabla = open(self.fileName[:-4] + ".co", "w+")
 		contador = 1
 		tabla.write("Tabla:\nLinea\t\t  CO\t\t CL\t\t   Intrucción\n")
 		for co in self.CO:
@@ -392,7 +392,7 @@ class Assembler(object):
 		self.CO.append(self.dir_in_e)
 		for co in self.CO:
 			codigo_objeto.write(co)
-		print("Codigo Objeto Creada")
+		#print("Codigo Objeto Creada")
 		codigo_objeto.close()
 
 
